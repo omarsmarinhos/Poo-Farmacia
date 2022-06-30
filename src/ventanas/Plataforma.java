@@ -5,6 +5,7 @@ import clases.DetalleVenta;
 import clases.Empleado;
 import clases.Producto;
 import clases.Venta;
+import conexion.ProductoJDBC;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Plataforma extends javax.swing.JFrame {
+
+    ProductoJDBC productoJDBC = new ProductoJDBC();
 
     DefaultTableModel modeloProdcutos = new DefaultTableModel();
     DefaultTableModel modeloClientes = new DefaultTableModel();
@@ -25,37 +28,25 @@ public class Plataforma extends javax.swing.JFrame {
     ArrayList<Venta> ventas = new ArrayList<>();
     ArrayList<DetalleVenta> detalles = new ArrayList<>();
 
+    int idProducto;
+
     public Plataforma() {
         this.setUndecorated(true);
         initComponents();
         this.setLocationRelativeTo(null);
-        String tituloP[] = {"Código", "Categoría", "Nombre", "Precio"};
+        String tituloP[] = {"Id", "Presentacion", "Nombre", "Concentracion", "stock", "Precio", "Fecha Vencimiento"};
         modeloProdcutos.setColumnIdentifiers(tituloP);
         String tituloD[] = {"Nombre", "Precio", "Cantidad", "Importe"};
         modeloDetalles.setColumnIdentifiers(tituloD);
         String tituloV[] = {"Combrobante", "Tipo de Pago", "Importe Total", "Fecha"};
         modeloVentas.setColumnIdentifiers(tituloV);
-        tbl_productos.setModel(modeloProdcutos);
+        tblProductos.setModel(modeloProdcutos);
         tblDetalles.setModel(modeloDetalles);
         tblCventas.setModel(modeloVentas);
 
-        //Provicional
-        productos.add(new Producto(1, "Prod01", 5));
-        productos.add(new Producto(2, "Prod02", 10));
-        productos.add(new Producto(3, "Prod03", 15));
+        btnPactualizar.setEnabled(false);
+        btnPeliminar.setEnabled(false);
 
-        actualizarTablaProducto();
-
-        ArrayList<DetalleVenta> temporal = new ArrayList<>();
-        temporal.add(new DetalleVenta(productos.get(0), 5));
-        temporal.add(new DetalleVenta(productos.get(1), 10));
-        temporal.add(new DetalleVenta(productos.get(2), 15));
-        ventas.add(new Venta("Comprobante-01",
-                temporal,
-                "Efectivo",
-                new Date()));
-        
-        actualizarTablaVenta();
     }
 
     void actualizarTablaProducto() {
@@ -67,9 +58,12 @@ public class Plataforma extends javax.swing.JFrame {
         for (int i = 0; i < productos.size(); i++) {
             modeloProdcutos.addRow(new Object[]{
                 productos.get(i).getIdProducto(),
-                cmbPcategoria.getSelectedItem(),
+                productos.get(i).getPresentacion(),
                 productos.get(i).getNombreProducto(),
-                productos.get(i).getPrecioVenta()
+                productos.get(i).getConcentracion(),
+                productos.get(i).getStock(),
+                productos.get(i).getPrecioVenta(),
+                productos.get(i).getFechaVencimiento()
             });
         }
     }
@@ -80,13 +74,13 @@ public class Plataforma extends javax.swing.JFrame {
             modeloVentas.removeRow(i);
         }
 
-        for (int i = 0; i < ventas.size(); i++) {
-            modeloVentas.addRow(new Object[]{
-                ventas.get(i).getIdVenta(),
-                ventas.get(i).getMetodoPago(),
-                ventas.get(i).getMonto(),
-                ventas.get(i).getFecha(),});
-        }
+//        for (int i = 0; i < ventas.size(); i++) {
+//            modeloVentas.addRow(new Object[]{
+//                ventas.get(i).getIdVenta(),
+//                ventas.get(i).getMetodoPago(),
+//                ventas.get(i).getMonto(),
+//                ventas.get(i).getFecha(),});
+//        }
     }
 
     @SuppressWarnings("unchecked")
@@ -98,22 +92,29 @@ public class Plataforma extends javax.swing.JFrame {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        cmbPcategoria = new javax.swing.JComboBox<>();
+        cmbPpresentacion = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
-        txtPprecio = new javax.swing.JTextField();
+        txtPconcentracion = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        txtPfechaVenc = new javax.swing.JTextField();
         txtPnombre = new javax.swing.JTextField();
-        txtPid = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        btn_registrar = new javax.swing.JButton();
-        txtPcampoBusqueda = new javax.swing.JTextField();
+        btnPregistrar = new javax.swing.JButton();
+        txtPbuscar = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tbl_productos = new javax.swing.JTable();
+        tblProductos = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        txtPstock = new javax.swing.JTextField();
+        jLabel27 = new javax.swing.JLabel();
+        txtPprecio = new javax.swing.JTextField();
+        jButton6 = new javax.swing.JButton();
+        btnPactualizar = new javax.swing.JButton();
+        btnPeliminar = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
@@ -172,17 +173,17 @@ public class Plataforma extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("Categoría");
+        jLabel1.setText("Presentación");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 120, -1, -1));
 
-        cmbPcategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Aminoacidos", "Antibioticos", "Analgesicos", " " }));
-        jPanel2.add(cmbPcategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 120, -1));
+        cmbPpresentacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Comprimido", "Pildora" }));
+        jPanel2.add(cmbPpresentacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 120, -1));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel2.setText("Precio:");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 120, -1, -1));
-        jPanel2.add(txtPprecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 120, 108, -1));
+        jLabel2.setText("Precio");
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 170, -1, -1));
+        jPanel2.add(txtPconcentracion, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 120, 108, -1));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 0, 102));
@@ -192,41 +193,41 @@ public class Plataforma extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel4.setText("Id del producto:");
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, -1, -1));
+        jLabel4.setText("Stock");
+        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel5.setText("Nombre:");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 80, -1, -1));
-        jPanel2.add(txtPnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 108, -1));
-        jPanel2.add(txtPid, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 120, -1));
+        jLabel5.setText("Fecha vencimiento");
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 80, -1, -1));
+        jPanel2.add(txtPfechaVenc, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 108, -1));
+        jPanel2.add(txtPnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 120, -1));
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(0, 0, 102));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("BUSCAR PRODUCTOS");
-        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, 591, -1));
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, 591, -1));
 
-        btn_registrar.setBackground(new java.awt.Color(204, 204, 255));
-        btn_registrar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btn_registrar.setForeground(new java.awt.Color(51, 51, 51));
-        btn_registrar.setText("Registrar");
-        btn_registrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btn_registrar.addActionListener(new java.awt.event.ActionListener() {
+        btnPregistrar.setBackground(new java.awt.Color(204, 204, 255));
+        btnPregistrar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnPregistrar.setForeground(new java.awt.Color(51, 51, 51));
+        btnPregistrar.setText("Registrar");
+        btnPregistrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnPregistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_registrarActionPerformed(evt);
+                btnPregistrarActionPerformed(evt);
             }
         });
-        jPanel2.add(btn_registrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 160, 130, 30));
-        jPanel2.add(txtPcampoBusqueda, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 270, 210, -1));
+        jPanel2.add(btnPregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 210, 130, 30));
+        jPanel2.add(txtPbuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 300, 210, -1));
 
         jScrollPane1.setBorder(null);
 
-        tbl_productos.setAutoCreateRowSorter(true);
-        tbl_productos.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
-        tbl_productos.setForeground(new java.awt.Color(102, 102, 102));
-        tbl_productos.setModel(new javax.swing.table.DefaultTableModel(
+        tblProductos.setAutoCreateRowSorter(true);
+        tblProductos.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        tblProductos.setForeground(new java.awt.Color(102, 102, 102));
+        tblProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -237,7 +238,12 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tbl_productos);
+        tblProductos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblProductosMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblProductos);
 
         jPanel2.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 340, 602, 194));
 
@@ -249,16 +255,64 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 270, 115, -1));
+        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 300, 115, -1));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(102, 102, 102));
         jLabel7.setText("Buscar nombre de producto:");
-        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, -1, -1));
+        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, -1, -1));
 
         jLabel25.setForeground(new java.awt.Color(153, 153, 255));
         jLabel25.setText("_______________________________________________________________________________________________________________________________________");
-        jPanel2.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 190, 680, 20));
+        jPanel2.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 680, 20));
+
+        jLabel18.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel18.setText("Nombre");
+        jPanel2.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, -1, -1));
+
+        txtPstock.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPstockKeyTyped(evt);
+            }
+        });
+        jPanel2.add(txtPstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 120, -1));
+
+        jLabel27.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel27.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel27.setText("Concetración");
+        jPanel2.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 120, -1, -1));
+
+        txtPprecio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPprecioKeyTyped(evt);
+            }
+        });
+        jPanel2.add(txtPprecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 160, 110, -1));
+
+        jButton6.setText("Mostrar");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 210, -1, -1));
+
+        btnPactualizar.setText("Actualizar");
+        btnPactualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPactualizarActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnPactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 210, -1, -1));
+
+        btnPeliminar.setText("Eliminar");
+        btnPeliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPeliminarActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnPeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
 
         jTabbedPane1.addTab("Productos", jPanel2);
 
@@ -740,31 +794,38 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel3MouseExited
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        String nombre = txtPcampoBusqueda.getText();
-        boolean flag = false;
-        for (int i = 0; i < productos.size(); i++) {
-            if (nombre.equalsIgnoreCase(productos.get(i).getNombreProducto())) {
-                flag = true;
-                break;
-            }
-        }
-        if (flag) {
-            JOptionPane.showMessageDialog(this, "El producto si se encuentra");
-        } else {
-            JOptionPane.showMessageDialog(this, "El producto no se encuentra");
-        }
+        String buscar = txtPbuscar.getText();
+
+        productos = productoJDBC.search(buscar);
+        actualizarTablaProducto();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void btn_registrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registrarActionPerformed
-        int idProducto = Integer.parseInt(txtPid.getText());
-        String nombre = txtPnombre.getText();
-        float precio = Float.parseFloat(txtPprecio.getText());
+    void limpiarRegistrosProductos() {
+        txtPnombre.setText("");
+        txtPconcentracion.setText("");
+        txtPfechaVenc.setText("");
+        txtPprecio.setText("");
+        txtPstock.setText("");
+    }
 
-        productos.add(new Producto(idProducto, nombre, precio));
+    private void btnPregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPregistrarActionPerformed
 
-        actualizarTablaProducto();
+        try {
+            String nombre = txtPnombre.getText();
+            String presentacion = (String) cmbPpresentacion.getSelectedItem();
+            int stock = Integer.parseInt(txtPstock.getText());
+            float precio = Float.parseFloat(txtPprecio.getText());
+            String concentracion = txtPconcentracion.getText();
+            String fechaVecn = txtPfechaVenc.getText();
+            productoJDBC.insert(new Producto(presentacion, nombre, concentracion, stock, precio, fechaVecn));
+            limpiarRegistrosProductos();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        }
 
-    }//GEN-LAST:event_btn_registrarActionPerformed
+        
+
+    }//GEN-LAST:event_btnPregistrarActionPerformed
 
     private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
         jTabbedPane1.setSelectedIndex(2);
@@ -808,7 +869,12 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel11MouseExited
 
     private void jPanel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseClicked
-        JOptionPane.showConfirmDialog(null, "Realmente desea cerrar sesión?", "Confirmar salida", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        int op = JOptionPane.showConfirmDialog(null, "Realmente desea cerrar sesión?", "Confirmar salida", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (op == 0) {
+            System.exit(0);
+            //esto es para ocultar el frame
+            //this.setVisible(false);
+        }
     }//GEN-LAST:event_jPanel12MouseClicked
 
     private void jPanel12MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseMoved
@@ -868,7 +934,7 @@ public class Plataforma extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         String idComprobante = txtVidcomprobante.getText();
         String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
-        ventas.add(new Venta(idComprobante, detalles, metodoPago, new Date()));
+//        ventas.add(new Venta(idComprobante, detalles, metodoPago, new Date()));
         detalles = new ArrayList<>();
         JOptionPane.showMessageDialog(this, "Venta procesada");
 
@@ -888,6 +954,75 @@ public class Plataforma extends javax.swing.JFrame {
 
         JOptionPane.showMessageDialog(this, karma);
     }//GEN-LAST:event_tblCventasMouseClicked
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        productos = productoJDBC.select();
+        actualizarTablaProducto();
+
+        btnPregistrar.setEnabled(true);
+        btnPactualizar.setEnabled(false);
+        btnPeliminar.setEnabled(false);
+
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void tblProductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProductosMouseClicked
+        int x = tblProductos.getSelectedRow();
+
+        idProducto = productos.get(x).getIdProducto();
+        txtPnombre.setText("" + productos.get(x).getNombreProducto());
+        txtPfechaVenc.setText("" + productos.get(x).getFechaVencimiento());
+        txtPconcentracion.setText("" + productos.get(x).getConcentracion());
+        txtPstock.setText("" + productos.get(x).getStock());
+        txtPprecio.setText("" + productos.get(x).getPrecioVenta());
+        cmbPpresentacion.setSelectedItem("" + productos.get(x).getPresentacion());
+        btnPregistrar.setEnabled(false);
+        btnPactualizar.setEnabled(true);
+        btnPeliminar.setEnabled(true);
+    }//GEN-LAST:event_tblProductosMouseClicked
+
+    private void btnPactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPactualizarActionPerformed
+        String nombre = txtPnombre.getText();
+        String presentacion = (String) cmbPpresentacion.getSelectedItem();
+        int stock = Integer.parseInt(txtPstock.getText());
+        float precio = Float.parseFloat(txtPprecio.getText());
+        String concentracion = txtPconcentracion.getText();
+        String fechaVecn = txtPfechaVenc.getText();
+
+        productoJDBC.update(new Producto(idProducto, presentacion, nombre, concentracion, stock, precio, fechaVecn));
+
+        limpiarRegistrosProductos();
+    }//GEN-LAST:event_btnPactualizarActionPerformed
+
+    private void btnPeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeliminarActionPerformed
+        String nombre = txtPnombre.getText();
+        String presentacion = (String) cmbPpresentacion.getSelectedItem();
+        int stock = Integer.parseInt(txtPstock.getText());
+        float precio = Float.parseFloat(txtPprecio.getText());
+        String concentracion = txtPconcentracion.getText();
+        String fechaVecn = txtPfechaVenc.getText();
+
+        productoJDBC.delete(new Producto(idProducto, presentacion, nombre, concentracion, stock, precio, fechaVecn));
+
+        limpiarRegistrosProductos();
+    }//GEN-LAST:event_btnPeliminarActionPerformed
+
+    private void txtPstockKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPstockKeyTyped
+        char validar = evt.getKeyChar();
+        if (Character.isLetter(validar)) {
+            getToolkit().beep();
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingresar solo numeros");
+        }
+    }//GEN-LAST:event_txtPstockKeyTyped
+
+    private void txtPprecioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPprecioKeyTyped
+        char validar = evt.getKeyChar();
+        if (Character.isLetter(validar)) {
+            getToolkit().beep();
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingresar solo numeros");
+        }
+    }//GEN-LAST:event_txtPprecioKeyTyped
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -922,8 +1057,10 @@ public class Plataforma extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public static javax.swing.JButton btn_registrar;
-    private javax.swing.JComboBox<String> cmbPcategoria;
+    private javax.swing.JButton btnPactualizar;
+    private javax.swing.JButton btnPeliminar;
+    public static javax.swing.JButton btnPregistrar;
+    private javax.swing.JComboBox<String> cmbPpresentacion;
     private javax.swing.JComboBox<String> cmbVmetodoPago;
     private javax.swing.JComboBox<String> cmbVunidad;
     private javax.swing.JButton jButton1;
@@ -931,6 +1068,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -940,6 +1078,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
@@ -949,6 +1088,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -976,11 +1116,13 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable tblCventas;
     private javax.swing.JTable tblDetalles;
-    private javax.swing.JTable tbl_productos;
-    public static javax.swing.JTextField txtPcampoBusqueda;
-    public static javax.swing.JTextField txtPid;
-    private javax.swing.JTextField txtPnombre;
+    private javax.swing.JTable tblProductos;
+    public static javax.swing.JTextField txtPbuscar;
+    private javax.swing.JTextField txtPconcentracion;
+    private javax.swing.JTextField txtPfechaVenc;
+    public static javax.swing.JTextField txtPnombre;
     private javax.swing.JTextField txtPprecio;
+    private javax.swing.JTextField txtPstock;
     private javax.swing.JTextField txtVcantidad;
     private javax.swing.JTextField txtVidcomprobante;
     private javax.swing.JTextField txtVmonto;

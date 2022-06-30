@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import conexion.ProductoJDBC;
 
 public class NewMain {
 
@@ -18,12 +19,14 @@ public class NewMain {
     
     public static void main(String[] args) {
         
+        ProductoJDBC productoJDBC = new ProductoJDBC();
+        productos = productoJDBC.select();
         //Obtener datos de la base de Datos
-        getProductosDB();
-        getEmpleadosDB();
-        getClientesDB();
-        getVentasDB();
-//        productos.forEach(producto -> System.out.println(producto));
+        //getProductosDB();
+        //getEmpleadosDB();
+        //getClientesDB();
+        //getVentasDB();
+        productos.forEach(producto -> System.out.println(producto));
 //        empleados.forEach(empleado -> System.out.println(empleado));
 //        clientes.forEach(cliente -> System.out.println(cliente));
          
@@ -31,7 +34,7 @@ public class NewMain {
 
         
         //mostrar todas las ventas
-        ventas.forEach(venta -> System.out.println(venta + "\n"));
+        //ventas.forEach(venta -> System.out.println(venta + "\n"));
         
         
         

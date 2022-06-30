@@ -16,7 +16,7 @@ public class Conexion {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(URL + DB, USER, PASSWORD);
+            connection = DriverManager.getConnection(URL + DB + "?useSSL=false", USER, PASSWORD);
             //System.out.println("conexion ok");
         } catch ( SQLException | ClassNotFoundException e) {
             System.out.println(e.toString());
@@ -25,4 +25,5 @@ public class Conexion {
         }
         
     }
+
 }

@@ -15,6 +15,17 @@ private String fechaVencimiento;
     public Producto() {
     }
 
+    public Producto(String presentacion, String nombreProducto, String concentracion, int stock, float precioVenta, String fechaVencimiento) {
+        this.presentacion = presentacion;
+        this.nombreProducto = nombreProducto;
+        this.concentracion = concentracion;
+        this.stock = stock;
+        this.precioVenta = precioVenta;
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    
+    
     public Producto(int idProducto, String nombreProducto, float precioVenta) {
         this.idProducto = idProducto;
         this.nombreProducto = nombreProducto;
