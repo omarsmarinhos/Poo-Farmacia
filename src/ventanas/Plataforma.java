@@ -5,16 +5,17 @@ import clases.DetalleVenta;
 import clases.Empleado;
 import clases.Producto;
 import clases.Venta;
+import conexion.EmpleadoJDBC;
 import conexion.ProductoJDBC;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Plataforma extends javax.swing.JFrame {
 
     ProductoJDBC productoJDBC = new ProductoJDBC();
+    EmpleadoJDBC empleadoJDBC = new EmpleadoJDBC();
 
     DefaultTableModel modeloProdcutos = new DefaultTableModel();
     DefaultTableModel modeloClientes = new DefaultTableModel();
@@ -29,23 +30,29 @@ public class Plataforma extends javax.swing.JFrame {
     ArrayList<DetalleVenta> detalles = new ArrayList<>();
 
     int idProducto;
+    int idEmpleado;
 
-    public Plataforma() {
+    public Plataforma(int id_empleado) {
         this.setUndecorated(true);
         initComponents();
         this.setLocationRelativeTo(null);
-        String tituloP[] = {"Id", "Presentacion", "Nombre", "Concentracion", "stock", "Precio", "Fecha Vencimiento"};
+        String tituloP[] = {"Id", "Presentacion", "Nombre", "Concentracion", "Stock", "Precio", "Fecha Vencimiento"};
         modeloProdcutos.setColumnIdentifiers(tituloP);
+        String tituloE[] = {"id Empleado", "Nombres", "Apellidos", "DNI", "Tipo empleado", "Sueldo", "Cargo"};
+        modeloEmpleados.setColumnIdentifiers(tituloE);
         String tituloD[] = {"Nombre", "Precio", "Cantidad", "Importe"};
         modeloDetalles.setColumnIdentifiers(tituloD);
         String tituloV[] = {"Combrobante", "Tipo de Pago", "Importe Total", "Fecha"};
         modeloVentas.setColumnIdentifiers(tituloV);
         tblProductos.setModel(modeloProdcutos);
+        tblEmpleados.setModel(modeloEmpleados);
         tblDetalles.setModel(modeloDetalles);
         tblCventas.setModel(modeloVentas);
 
         btnPactualizar.setEnabled(false);
         btnPeliminar.setEnabled(false);
+        
+        actualizarEmpleadoActual(id_empleado);
 
     }
 
@@ -67,6 +74,25 @@ public class Plataforma extends javax.swing.JFrame {
             });
         }
     }
+    
+    void actualizarTablaEmpleado() {
+        int nRow = modeloEmpleados.getRowCount();
+        for (int i = nRow - 1; i >= 0; i--) {
+            modeloEmpleados.removeRow(i);
+        }
+
+        for (int i = 0; i < empleados.size(); i++) {
+            modeloEmpleados.addRow(new Object[]{
+                empleados.get(i).getidEmpleado(),
+                empleados.get(i).getNombre(),
+                empleados.get(i).getApellido(),
+                empleados.get(i).getDni(),
+                empleados.get(i).getTipoEmpleado(),
+                empleados.get(i).getSueldo(),
+                empleados.get(i).getCargo()
+            });
+        }
+    }
 
     void actualizarTablaVenta() {
         int nRow = modeloVentas.getRowCount();
@@ -81,6 +107,10 @@ public class Plataforma extends javax.swing.JFrame {
 //                ventas.get(i).getMonto(),
 //                ventas.get(i).getFecha(),});
 //        }
+    }
+    
+    private void actualizarEmpleadoActual(int id_empleado){
+        txtUsuarioActivo.setText("" + empleadoJDBC.getEmpleadoActual(id_empleado));
     }
 
     @SuppressWarnings("unchecked")
@@ -139,11 +169,27 @@ public class Plataforma extends javax.swing.JFrame {
         tblCventas = new javax.swing.JTable();
         jPanel13 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
-        jLabel21 = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        txtEnombres = new javax.swing.JTextField();
+        txtEapellidos = new javax.swing.JTextField();
+        txtEdni = new javax.swing.JTextField();
+        cmbEtipoEmpleado = new javax.swing.JComboBox<>();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblEmpleados = new javax.swing.JTable();
+        btnEagregar = new javax.swing.JButton();
+        btnEactualizar = new javax.swing.JButton();
+        btnEeliminar = new javax.swing.JButton();
+        btnEmostrar = new javax.swing.JButton();
+        jLabel29 = new javax.swing.JLabel();
+        txtEsueldo = new javax.swing.JTextField();
+        jLabel30 = new javax.swing.JLabel();
+        txtEcargo = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        txtUsuarioActivo = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
@@ -165,6 +211,11 @@ public class Plataforma extends javax.swing.JFrame {
         getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.png"))); // NOI18N
+        jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel8MousePressed(evt);
+            }
+        });
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 870, 80));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -521,23 +572,141 @@ public class Plataforma extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("REPORTES", jPanel13);
 
-        jLabel21.setText("jLabel21");
+        jLabel10.setText("Nombres");
+
+        jLabel11.setText("Apellidos");
+
+        jLabel21.setText("DNI");
+
+        jLabel28.setText("Tipo de empleado");
+
+        cmbEtipoEmpleado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrador", "Usuario" }));
+
+        tblEmpleados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblEmpleados.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEmpleadosMouseClicked(evt);
+            }
+        });
+        jScrollPane4.setViewportView(tblEmpleados);
+
+        btnEagregar.setText("Agregar");
+        btnEagregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEagregarActionPerformed(evt);
+            }
+        });
+
+        btnEactualizar.setText("Actualizar");
+        btnEactualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEactualizarActionPerformed(evt);
+            }
+        });
+
+        btnEeliminar.setText("Eliminar");
+        btnEeliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEeliminarActionPerformed(evt);
+            }
+        });
+
+        btnEmostrar.setText("Mostrar");
+        btnEmostrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEmostrarActionPerformed(evt);
+            }
+        });
+
+        jLabel29.setText("Sueldo");
+
+        jLabel30.setText("Cargo");
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
         jPanel14.setLayout(jPanel14Layout);
         jPanel14Layout.setHorizontalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
-                .addGap(79, 79, 79)
-                .addComponent(jLabel21)
-                .addContainerGap(568, Short.MAX_VALUE))
+                .addGap(36, 36, 36)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel14Layout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtEnombres, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel14Layout.createSequentialGroup()
+                                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel21))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtEdni, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtEapellidos, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel14Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(btnEagregar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnEactualizar)))
+                        .addGap(66, 66, 66)
+                        .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel14Layout.createSequentialGroup()
+                                .addComponent(btnEeliminar)
+                                .addGap(48, 48, 48)
+                                .addComponent(btnEmostrar))
+                            .addGroup(jPanel14Layout.createSequentialGroup()
+                                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel28)
+                                    .addComponent(jLabel29)
+                                    .addComponent(jLabel30))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cmbEtipoEmpleado, 0, 150, Short.MAX_VALUE)
+                                    .addComponent(txtEsueldo)
+                                    .addComponent(txtEcargo))))))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addComponent(jLabel21)
-                .addContainerGap(507, Short.MAX_VALUE))
+                .addGap(48, 48, 48)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(jLabel28)
+                    .addComponent(txtEnombres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbEtipoEmpleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(txtEapellidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel29)
+                    .addComponent(txtEsueldo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel21)
+                    .addComponent(txtEdni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel30)
+                    .addComponent(txtEcargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnEagregar)
+                    .addComponent(btnEactualizar)
+                    .addComponent(btnEeliminar)
+                    .addComponent(btnEmostrar))
+                .addGap(34, 34, 34)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(91, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("SOPORTE TECNICO", jPanel14);
@@ -550,13 +719,9 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/usuario.png"))); // NOI18N
         jPanel7.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 80, 90));
 
-        jLabel10.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel10.setText("Quimico Farmaceutico");
-        jPanel7.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 110, -1));
-
-        jLabel11.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel11.setText("EDDY OLIVO AYALA");
-        jPanel7.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 120, 20));
+        txtUsuarioActivo.setForeground(new java.awt.Color(102, 102, 102));
+        txtUsuarioActivo.setText("EDDY OLIVO AYALA");
+        jPanel7.add(txtUsuarioActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 120, 20));
 
         getContentPane().add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 190, 150));
 
@@ -607,8 +772,8 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel17.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(102, 102, 102));
         jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/bolsa.png"))); // NOI18N
-        jLabel17.setText("  REGISTRAR VENTA");
-        jPanel3.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 180, -1));
+        jLabel17.setText(" REGISTRAR VENTA");
+        jPanel3.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 180, -1));
 
         jPanel10.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 190, 40));
 
@@ -706,7 +871,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(102, 102, 102));
         jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/sorporte (1).png"))); // NOI18N
-        jLabel12.setText("SOPORTE TECNICO");
+        jLabel12.setText("EMPLEADOS");
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
@@ -715,7 +880,7 @@ public class Plataforma extends javax.swing.JFrame {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel12)
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(73, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -800,12 +965,20 @@ public class Plataforma extends javax.swing.JFrame {
         actualizarTablaProducto();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    void limpiarRegistrosProductos() {
+    private void limpiarRegistrosProductos() {
         txtPnombre.setText("");
         txtPconcentracion.setText("");
         txtPfechaVenc.setText("");
         txtPprecio.setText("");
         txtPstock.setText("");
+    }
+    
+    private void limpiarRegistrosEmpleados() {
+        txtEnombres.setText("");
+        txtEapellidos.setText("");
+        txtEdni.setText("");
+        txtEsueldo.setText("");
+        txtEcargo.setText("");
     }
 
     private void btnPregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPregistrarActionPerformed
@@ -1023,6 +1196,66 @@ public class Plataforma extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Ingresar solo numeros");
         }
     }//GEN-LAST:event_txtPprecioKeyTyped
+int xx, xy;
+    private void jLabel8MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MousePressed
+        
+    }//GEN-LAST:event_jLabel8MousePressed
+
+    private void btnEagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEagregarActionPerformed
+        String nombres = txtEnombres.getText();
+        String apellidos = txtEapellidos.getText();
+        String dni = txtEdni.getText();
+        String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
+        float sueldo = Float.parseFloat(txtEsueldo.getText());
+        String cargo = txtEcargo.getText();
+        
+        empleadoJDBC.insert(new Empleado(nombres, apellidos, dni, tipo, sueldo, cargo));
+        
+        limpiarRegistrosEmpleados();
+    }//GEN-LAST:event_btnEagregarActionPerformed
+
+    private void btnEmostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmostrarActionPerformed
+        empleados = empleadoJDBC.select();
+        actualizarTablaEmpleado();
+
+        btnEagregar.setEnabled(true);
+        btnEactualizar.setEnabled(false);
+        btnEeliminar.setEnabled(false);
+    }//GEN-LAST:event_btnEmostrarActionPerformed
+
+    private void tblEmpleadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEmpleadosMouseClicked
+        int x = tblEmpleados.getSelectedRow();//0
+
+        idEmpleado = empleados.get(x).getidEmpleado();
+        txtEnombres.setText("" + empleados.get(x).getNombre());
+        txtEapellidos.setText("" + empleados.get(x).getApellido());
+        txtEdni.setText("" + empleados.get(x).getDni());
+        cmbEtipoEmpleado.setSelectedItem("" + empleados.get(x).getTipoEmpleado());
+        txtEsueldo.setText("" + empleados.get(x).getSueldo());
+        txtEcargo.setText("" + empleados.get(x).getCargo());
+        btnEagregar.setEnabled(false);
+        btnEactualizar.setEnabled(true);
+        btnEeliminar.setEnabled(true);
+    }//GEN-LAST:event_tblEmpleadosMouseClicked
+
+    private void btnEactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEactualizarActionPerformed
+        String nombre = txtEnombres.getText();
+        String apellidos = txtEapellidos.getText();
+        String dni = txtEdni.getText();
+        String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
+        float sueldo = Float.parseFloat(txtEsueldo.getText());
+        String cargo = txtEcargo.getText();
+
+        empleadoJDBC.update(new Empleado(idEmpleado ,nombre, apellidos, dni, tipo, sueldo, cargo));
+        
+        limpiarRegistrosEmpleados();
+    }//GEN-LAST:event_btnEactualizarActionPerformed
+
+    private void btnEeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEeliminarActionPerformed
+        
+        empleadoJDBC.delete(new Empleado(idEmpleado));
+        limpiarRegistrosEmpleados();
+    }//GEN-LAST:event_btnEeliminarActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -1051,15 +1284,20 @@ public class Plataforma extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Plataforma().setVisible(true);
+                new Plataforma(0).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEactualizar;
+    private javax.swing.JButton btnEagregar;
+    private javax.swing.JButton btnEeliminar;
+    private javax.swing.JButton btnEmostrar;
     private javax.swing.JButton btnPactualizar;
     private javax.swing.JButton btnPeliminar;
     public static javax.swing.JButton btnPregistrar;
+    private javax.swing.JComboBox<String> cmbEtipoEmpleado;
     private javax.swing.JComboBox<String> cmbPpresentacion;
     private javax.swing.JComboBox<String> cmbVmetodoPago;
     private javax.swing.JComboBox<String> cmbVunidad;
@@ -1089,7 +1327,10 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1113,16 +1354,24 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable tblCventas;
     private javax.swing.JTable tblDetalles;
+    private javax.swing.JTable tblEmpleados;
     private javax.swing.JTable tblProductos;
+    private javax.swing.JTextField txtEapellidos;
+    private javax.swing.JTextField txtEcargo;
+    private javax.swing.JTextField txtEdni;
+    private javax.swing.JTextField txtEnombres;
+    private javax.swing.JTextField txtEsueldo;
     public static javax.swing.JTextField txtPbuscar;
     private javax.swing.JTextField txtPconcentracion;
     private javax.swing.JTextField txtPfechaVenc;
     public static javax.swing.JTextField txtPnombre;
     private javax.swing.JTextField txtPprecio;
     private javax.swing.JTextField txtPstock;
+    private javax.swing.JLabel txtUsuarioActivo;
     private javax.swing.JTextField txtVcantidad;
     private javax.swing.JTextField txtVidcomprobante;
     private javax.swing.JTextField txtVmonto;

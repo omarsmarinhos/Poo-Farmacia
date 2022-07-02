@@ -5,17 +5,25 @@ public class Empleado extends Persona {
     private int idEmpleado;
     private float sueldo;
     private String tipoEmpleado;
+    private String cargo;
 
-    public Empleado(int idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    public Empleado(String nombre, String apellido, String dni, String tipoEmpleado, float sueldo, String cargo) {
+        super(nombre, apellido, dni);
+        this.sueldo = sueldo;
+        this.tipoEmpleado = tipoEmpleado;
+        this.cargo = cargo;
     }
 
-    public Empleado(int idEmpleado, String nombre, String apellido, String dni, 
-            String tipoEmpleado, float sueldo) {
+    public Empleado(int idEmpleado, String nombre, String apellido, String dni, String tipoEmpleado, float sueldo, String cargo) {
         super(nombre, apellido, dni);
         this.idEmpleado = idEmpleado;
         this.sueldo = sueldo;
         this.tipoEmpleado = tipoEmpleado;
+        this.cargo = cargo;
+    }
+
+    public Empleado(int idEmpleado) {
+        this.idEmpleado = idEmpleado;
     }
     
     public int getidEmpleado() {
@@ -42,6 +50,16 @@ public class Empleado extends Persona {
         this.tipoEmpleado = tipoEmpleado;
     }
 
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
+
+    
+    
     @Override
     public String toString() {
         return "idEmpleado= " + idEmpleado + ", sueldo=" + sueldo + ", tipo=" + 

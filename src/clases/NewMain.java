@@ -19,14 +19,14 @@ public class NewMain {
     
     public static void main(String[] args) {
         
-        ProductoJDBC productoJDBC = new ProductoJDBC();
-        productos = productoJDBC.select();
+//        ProductoJDBC productoJDBC = new ProductoJDBC();
+//        productos = productoJDBC.select();
         //Obtener datos de la base de Datos
         //getProductosDB();
         //getEmpleadosDB();
         //getClientesDB();
         //getVentasDB();
-        productos.forEach(producto -> System.out.println(producto));
+//        productos.forEach(producto -> System.out.println(producto));
 //        empleados.forEach(empleado -> System.out.println(empleado));
 //        clientes.forEach(cliente -> System.out.println(cliente));
          
@@ -99,29 +99,29 @@ public class NewMain {
     }
     
     //Obtiene los empleados de la base de datos
-    static void getEmpleadosDB() {
-        empleados = new ArrayList<>();
-        try {
-            Statement sql = Conexion.getConexion().createStatement();
-            String query = "SELECT * FROM empleados";
-            ResultSet rs = sql.executeQuery(query);
-
-            while (rs.next()) {
-                empleados.add(new Empleado(
-                        rs.getInt("id_empleado"), 
-                        rs.getString("nombres"), 
-                        rs.getString("apellidos"), 
-                        rs.getString("dni"), 
-                        rs.getString("tipo_empleado"), 
-                        rs.getFloat("sueldo")));
-            }
-            rs.close();
-            sql.close();
-            System.out.println("Empleados-obtenidos");
-        } catch (SQLException ex) {
-            System.out.println("Error getEmpleadosDB" + ex.toString());
-        }
-    }
+//    static void getEmpleadosDB() {
+//        empleados = new ArrayList<>();
+//        try {
+//            Statement sql = Conexion.getConexion().createStatement();
+//            String query = "SELECT * FROM empleados";
+//            ResultSet rs = sql.executeQuery(query);
+//
+//            while (rs.next()) {
+//                empleados.add(new Empleado(
+//                        rs.getInt("id_empleado"), 
+//                        rs.getString("nombres"), 
+//                        rs.getString("apellidos"), 
+//                        rs.getString("dni"), 
+//                        rs.getString("tipo_empleado"), 
+//                        rs.getFloat("sueldo")));
+//            }
+//            rs.close();
+//            sql.close();
+//            System.out.println("Empleados-obtenidos");
+//        } catch (SQLException ex) {
+//            System.out.println("Error getEmpleadosDB" + ex.toString());
+//        }
+//    }
     
     //Obtiene los clientes de la base de datos
     static void getClientesDB() {

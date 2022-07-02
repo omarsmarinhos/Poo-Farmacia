@@ -5,7 +5,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductoJDBC {
+public class ProductoJDBC implements ProductoDao{
 
     private static final String SQL_SELECT = "SELECT * FROM productos";
     private static final String SQL_INSERT = "INSERT INTO productos( presentacion, nombre_producto, concentracion, stock, precio_venta, fecha_vencimiento) "
@@ -15,6 +15,7 @@ public class ProductoJDBC {
             + "WHERE id_producto = ?";
     private static final String SQL_DELETE = "DELETE FROM productos WHERE id_producto=?";
 
+    @Override
     public ArrayList<Producto> select() {
         ArrayList<Producto> productos = new ArrayList<>();
         try {
@@ -42,10 +43,10 @@ public class ProductoJDBC {
         return productos;
     }
 
+    @Override
     public void insert(Producto producto) {
-        PreparedStatement stmt = null;
         try {
-            stmt = Conexion.getConexion().prepareStatement(SQL_INSERT);
+            PreparedStatement stmt = Conexion.getConexion().prepareStatement(SQL_INSERT);
             stmt.setString(1, producto.getPresentacion());
             stmt.setString(2, producto.getNombreProducto());
             stmt.setString(3, producto.getConcentracion());
@@ -61,6 +62,7 @@ public class ProductoJDBC {
         } 
     }
 
+    @Override
     public void update(Producto producto) {
         PreparedStatement stmt = null;
         try {
@@ -83,6 +85,7 @@ public class ProductoJDBC {
 
     }
 
+    @Override
     public void delete(Producto producto) {
         PreparedStatement stmt = null;
         try {
@@ -96,6 +99,7 @@ public class ProductoJDBC {
         } 
     }
     
+    @Override
     public ArrayList<Producto> search(String string){
         ArrayList<Producto> productos = new ArrayList<>();
         Statement stmt = null;

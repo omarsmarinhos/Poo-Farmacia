@@ -8,9 +8,11 @@ public interface ProductoDao {
     
     public List<Producto> select() throws SQLException;
     
-    public int insert(Producto producto) throws SQLException;
+    public void insert(Producto producto) throws SQLException;
     
-    public int update(Producto producto) throws SQLException;
+    public void update(Producto producto) throws SQLException;
     
-    public int delete(Producto producto) throws SQLException;
+    public void delete(Producto producto) throws SQLException;
+    
+    public List<Producto> search(String buscar) throws SQLException;
 }
