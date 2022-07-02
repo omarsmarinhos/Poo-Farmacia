@@ -51,7 +51,10 @@ public class Plataforma extends javax.swing.JFrame {
 
         btnPactualizar.setEnabled(false);
         btnPeliminar.setEnabled(false);
-        
+
+        btnEactualizar.setEnabled(false);
+        btnEeliminar.setEnabled(false);
+
         actualizarEmpleadoActual(id_empleado);
 
     }
@@ -74,7 +77,7 @@ public class Plataforma extends javax.swing.JFrame {
             });
         }
     }
-    
+
     void actualizarTablaEmpleado() {
         int nRow = modeloEmpleados.getRowCount();
         for (int i = nRow - 1; i >= 0; i--) {
@@ -108,8 +111,8 @@ public class Plataforma extends javax.swing.JFrame {
 //                ventas.get(i).getFecha(),});
 //        }
     }
-    
-    private void actualizarEmpleadoActual(int id_empleado){
+
+    private void actualizarEmpleadoActual(int id_empleado) {
         txtUsuarioActivo.setText("" + empleadoJDBC.getEmpleadoActual(id_empleado));
     }
 
@@ -179,7 +182,7 @@ public class Plataforma extends javax.swing.JFrame {
         cmbEtipoEmpleado = new javax.swing.JComboBox<>();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblEmpleados = new javax.swing.JTable();
-        btnEagregar = new javax.swing.JButton();
+        btnEregistrar = new javax.swing.JButton();
         btnEactualizar = new javax.swing.JButton();
         btnEeliminar = new javax.swing.JButton();
         btnEmostrar = new javax.swing.JButton();
@@ -211,6 +214,11 @@ public class Plataforma extends javax.swing.JFrame {
         getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.png"))); // NOI18N
+        jLabel8.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jLabel8MouseDragged(evt);
+            }
+        });
         jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jLabel8MousePressed(evt);
@@ -580,8 +588,15 @@ public class Plataforma extends javax.swing.JFrame {
 
         jLabel28.setText("Tipo de empleado");
 
+        txtEdni.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtEdniKeyTyped(evt);
+            }
+        });
+
         cmbEtipoEmpleado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrador", "Usuario" }));
 
+        tblEmpleados.setAutoCreateRowSorter(true);
         tblEmpleados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -600,10 +615,10 @@ public class Plataforma extends javax.swing.JFrame {
         });
         jScrollPane4.setViewportView(tblEmpleados);
 
-        btnEagregar.setText("Agregar");
-        btnEagregar.addActionListener(new java.awt.event.ActionListener() {
+        btnEregistrar.setText("Agregar");
+        btnEregistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEagregarActionPerformed(evt);
+                btnEregistrarActionPerformed(evt);
             }
         });
 
@@ -629,6 +644,12 @@ public class Plataforma extends javax.swing.JFrame {
         });
 
         jLabel29.setText("Sueldo");
+
+        txtEsueldo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtEsueldoKeyTyped(evt);
+            }
+        });
 
         jLabel30.setText("Cargo");
 
@@ -656,7 +677,7 @@ public class Plataforma extends javax.swing.JFrame {
                                     .addComponent(txtEapellidos, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel14Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
-                                .addComponent(btnEagregar)
+                                .addComponent(btnEregistrar)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnEactualizar)))
                         .addGap(66, 66, 66)
@@ -700,7 +721,7 @@ public class Plataforma extends javax.swing.JFrame {
                     .addComponent(txtEcargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(33, 33, 33)
                 .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnEagregar)
+                    .addComponent(btnEregistrar)
                     .addComponent(btnEactualizar)
                     .addComponent(btnEeliminar)
                     .addComponent(btnEmostrar))
@@ -972,7 +993,7 @@ public class Plataforma extends javax.swing.JFrame {
         txtPprecio.setText("");
         txtPstock.setText("");
     }
-    
+
     private void limpiarRegistrosEmpleados() {
         txtEnombres.setText("");
         txtEapellidos.setText("");
@@ -995,8 +1016,6 @@ public class Plataforma extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
         }
-
-        
 
     }//GEN-LAST:event_btnPregistrarActionPerformed
 
@@ -1154,16 +1173,22 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_tblProductosMouseClicked
 
     private void btnPactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPactualizarActionPerformed
-        String nombre = txtPnombre.getText();
-        String presentacion = (String) cmbPpresentacion.getSelectedItem();
-        int stock = Integer.parseInt(txtPstock.getText());
-        float precio = Float.parseFloat(txtPprecio.getText());
-        String concentracion = txtPconcentracion.getText();
-        String fechaVecn = txtPfechaVenc.getText();
 
-        productoJDBC.update(new Producto(idProducto, presentacion, nombre, concentracion, stock, precio, fechaVecn));
+        try {
+            String nombre = txtPnombre.getText();
+            String presentacion = (String) cmbPpresentacion.getSelectedItem();
+            int stock = Integer.parseInt(txtPstock.getText());
+            float precio = Float.parseFloat(txtPprecio.getText());
+            String concentracion = txtPconcentracion.getText();
+            String fechaVecn = txtPfechaVenc.getText();
 
-        limpiarRegistrosProductos();
+            productoJDBC.update(new Producto(idProducto, presentacion, nombre, concentracion, stock, precio, fechaVecn));
+
+            limpiarRegistrosProductos();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        }
+
     }//GEN-LAST:event_btnPactualizarActionPerformed
 
     private void btnPeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeliminarActionPerformed
@@ -1196,29 +1221,35 @@ public class Plataforma extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Ingresar solo numeros");
         }
     }//GEN-LAST:event_txtPprecioKeyTyped
-int xx, xy;
+    int xx, xy;
     private void jLabel8MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MousePressed
-        
+        xx = evt.getX();
+        xy = evt.getY();
     }//GEN-LAST:event_jLabel8MousePressed
 
-    private void btnEagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEagregarActionPerformed
-        String nombres = txtEnombres.getText();
-        String apellidos = txtEapellidos.getText();
-        String dni = txtEdni.getText();
-        String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
-        float sueldo = Float.parseFloat(txtEsueldo.getText());
-        String cargo = txtEcargo.getText();
-        
-        empleadoJDBC.insert(new Empleado(nombres, apellidos, dni, tipo, sueldo, cargo));
-        
-        limpiarRegistrosEmpleados();
-    }//GEN-LAST:event_btnEagregarActionPerformed
+    private void btnEregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEregistrarActionPerformed
+        try {
+            String nombres = txtEnombres.getText();
+            String apellidos = txtEapellidos.getText();
+            String dni = txtEdni.getText();
+            String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
+            float sueldo = Float.parseFloat(txtEsueldo.getText());
+            String cargo = txtEcargo.getText();
+
+            empleadoJDBC.insert(new Empleado(nombres, apellidos, dni, tipo, sueldo, cargo));
+
+            limpiarRegistrosEmpleados();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        }
+
+    }//GEN-LAST:event_btnEregistrarActionPerformed
 
     private void btnEmostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmostrarActionPerformed
         empleados = empleadoJDBC.select();
         actualizarTablaEmpleado();
 
-        btnEagregar.setEnabled(true);
+        btnEregistrar.setEnabled(true);
         btnEactualizar.setEnabled(false);
         btnEeliminar.setEnabled(false);
     }//GEN-LAST:event_btnEmostrarActionPerformed
@@ -1233,29 +1264,60 @@ int xx, xy;
         cmbEtipoEmpleado.setSelectedItem("" + empleados.get(x).getTipoEmpleado());
         txtEsueldo.setText("" + empleados.get(x).getSueldo());
         txtEcargo.setText("" + empleados.get(x).getCargo());
-        btnEagregar.setEnabled(false);
+        btnEregistrar.setEnabled(false);
         btnEactualizar.setEnabled(true);
         btnEeliminar.setEnabled(true);
     }//GEN-LAST:event_tblEmpleadosMouseClicked
 
     private void btnEactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEactualizarActionPerformed
-        String nombre = txtEnombres.getText();
-        String apellidos = txtEapellidos.getText();
-        String dni = txtEdni.getText();
-        String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
-        float sueldo = Float.parseFloat(txtEsueldo.getText());
-        String cargo = txtEcargo.getText();
+        try {
+            String nombre = txtEnombres.getText();
+            String apellidos = txtEapellidos.getText();
+            String dni = txtEdni.getText();
+            String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
+            float sueldo = Float.parseFloat(txtEsueldo.getText());
+            String cargo = txtEcargo.getText();
 
-        empleadoJDBC.update(new Empleado(idEmpleado ,nombre, apellidos, dni, tipo, sueldo, cargo));
-        
-        limpiarRegistrosEmpleados();
+            empleadoJDBC.update(new Empleado(idEmpleado, nombre, apellidos, dni, tipo, sueldo, cargo));
+
+            limpiarRegistrosEmpleados();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        }
+
+
     }//GEN-LAST:event_btnEactualizarActionPerformed
 
     private void btnEeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEeliminarActionPerformed
-        
+
         empleadoJDBC.delete(new Empleado(idEmpleado));
         limpiarRegistrosEmpleados();
     }//GEN-LAST:event_btnEeliminarActionPerformed
+
+    private void jLabel8MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MouseDragged
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+
+        this.setLocation(x - xx, y - xy);
+    }//GEN-LAST:event_jLabel8MouseDragged
+
+    private void txtEdniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEdniKeyTyped
+        char validar = evt.getKeyChar();
+        if (Character.isLetter(validar)) {
+            getToolkit().beep();
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingresar solo numeros");
+        }
+    }//GEN-LAST:event_txtEdniKeyTyped
+
+    private void txtEsueldoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEsueldoKeyTyped
+        char validar = evt.getKeyChar();
+        if (Character.isLetter(validar)) {
+            getToolkit().beep();
+            evt.consume();
+            JOptionPane.showMessageDialog(null, "Ingresar solo numeros");
+        }
+    }//GEN-LAST:event_txtEsueldoKeyTyped
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -1291,9 +1353,9 @@ int xx, xy;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEactualizar;
-    private javax.swing.JButton btnEagregar;
     private javax.swing.JButton btnEeliminar;
     private javax.swing.JButton btnEmostrar;
+    private javax.swing.JButton btnEregistrar;
     private javax.swing.JButton btnPactualizar;
     private javax.swing.JButton btnPeliminar;
     public static javax.swing.JButton btnPregistrar;

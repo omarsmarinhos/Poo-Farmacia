@@ -43,7 +43,5 @@ public class Usuario {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    
-    
+ 
 }
