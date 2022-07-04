@@ -177,10 +177,10 @@ public class NewMain {
                     detalles.add(new DetalleVenta(productos.get(idProducto), cantidad));
                 }
                 
-                ventas.add(new Venta(idVenta, empleados.get(idEmpleado), 
-                        clientes.get(idCliente), detalles, metodoPago, fecha));
-                rsDetail.close();
-                sqlDetail.close();
+//                ventas.add(new Venta(idVenta, empleados.get(idEmpleado), 
+//                        clientes.get(idCliente), detalles, metodoPago, fecha));
+//                rsDetail.close();
+//                sqlDetail.close();
             }
             sqlVenta.close();
             rsVenta.close();

@@ -13,8 +13,10 @@ public class Venta {
     private String metodoPago;
     private String fecha;
 
-    public Venta(int idVenta, ArrayList<DetalleVenta> detalles, String metodoPago, String fecha) {
+    public Venta(int idVenta, Empleado empleado, Cliente cliente, ArrayList<DetalleVenta> detalles, String metodoPago, String fecha) {
         this.idVenta = idVenta;
+        this.empleado = empleado;
+        this.cliente = cliente;
         this.detalles = detalles;
         this.metodoPago = metodoPago;
         this.fecha = fecha;
@@ -26,15 +28,8 @@ public class Venta {
         this.detalles = detalles;
         this.metodoPago = metodoPago;
     }
+
     
-    public Venta(int idVenta, Empleado empleado, Cliente cliente, ArrayList<DetalleVenta> detalles, String metodoPago, String fecha) {
-        this.idVenta = idVenta;
-        this.empleado = empleado;
-        this.cliente = cliente;
-        this.detalles = detalles;
-        this.metodoPago = metodoPago;
-        this.fecha = fecha;
-    }
 
     public int getIdVenta() {
         return idVenta;
