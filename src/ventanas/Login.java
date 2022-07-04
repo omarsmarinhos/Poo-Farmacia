@@ -105,7 +105,7 @@ public class Login extends javax.swing.JFrame {
                 if (passDB.equals(MD5(pass))) {
                     Plataforma p = new Plataforma(id_empleado);
                     p.setVisible(true);
-                    this.setVisible(false);
+                    this.dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, "Contraseña incorrecta");
                 }

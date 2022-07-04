@@ -19,15 +19,10 @@ public class Cliente extends Persona {
         this.razonSocial = razonSocial;
         this.tipoPersona = tipoPersona;
     }
-
-    //persona natural
-    public Cliente(String nombre, String apellido, String dni, String direccion, String tipoPersona) {
+    
+    public Cliente(String tipoPersona, String nombre, String apellido, 
+        String dni, String ruc, String razonSocial) {
         super(nombre, apellido, dni);
-        this.tipoPersona = tipoPersona;
-    }
-
-    //persona juridica
-    public Cliente(String ruc, String razonSocial, String tipoPersona) {
         this.ruc = ruc;
         this.razonSocial = razonSocial;
         this.tipoPersona = tipoPersona;
