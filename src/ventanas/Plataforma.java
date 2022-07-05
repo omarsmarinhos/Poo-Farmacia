@@ -73,6 +73,7 @@ public class Plataforma extends javax.swing.JFrame {
         tblCventas.setModel(modeloVentas);
         tblClientesDialog.setModel(modeloClientes);
         tblProductosDialog.setModel(modeloProdcutos);
+        tblDetallesDialog.setModel(modeloDetalles);
     }
 
     private void actualizarTablaProducto() {
@@ -146,6 +147,21 @@ public class Plataforma extends javax.swing.JFrame {
                 ventas.get(i).getFecha(),});
         }
     }
+    
+    private void actualizarTablaDetalle(int x) {
+        int nRow = modeloDetalles.getRowCount();
+        for (int i = nRow - 1; i >= 0; i--) {
+            modeloDetalles.removeRow(i);
+        }
+
+        for (int i = 0; i < ventas.get(x).getDetalles().size(); i++) {
+            modeloDetalles.addRow(new Object[]{
+                ventas.get(x).getDetalles().get(i).getProducto().getNombreProducto(),
+                ventas.get(i).getDetalles().get(i).getProducto().getPrecioVenta(),
+                ventas.get(i).getDetalles().get(i).getCantidad(),
+                ventas.get(i).getDetalles().get(i).getImporte(),});
+        }
+    }
 
     private void actualizarEmpleadoActual(int id_empleado) {
         txtUsuarioActivo.setText("" + empleadoJDBC.getEmpleadoActual(id_empleado));
@@ -162,7 +178,9 @@ public class Plataforma extends javax.swing.JFrame {
         jDialogproducto = new javax.swing.JDialog();
         jScrollPane7 = new javax.swing.JScrollPane();
         tblProductosDialog = new javax.swing.JTable();
-        jLabel32 = new javax.swing.JLabel();
+        jDialogDetalles = new javax.swing.JDialog();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        tblDetallesDialog = new javax.swing.JTable();
         jLabel31 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -347,30 +365,59 @@ public class Plataforma extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jDialogDetalles.setLocationByPlatform(true);
+        jDialogDetalles.setModal(true);
+        jDialogDetalles.setResizable(false);
+        jDialogDetalles.setSize(new java.awt.Dimension(600, 300));
+
+        tblDetallesDialog.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane9.setViewportView(tblDetallesDialog);
+
+        javax.swing.GroupLayout jDialogDetallesLayout = new javax.swing.GroupLayout(jDialogDetalles.getContentPane());
+        jDialogDetalles.getContentPane().setLayout(jDialogDetallesLayout);
+        jDialogDetallesLayout.setHorizontalGroup(
+            jDialogDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+        );
+        jDialogDetallesLayout.setVerticalGroup(
+            jDialogDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("LianFarma");
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel32.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel32.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/conectado.png"))); // NOI18N
-        jLabel32.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jLabel32.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel32MouseClicked(evt);
-            }
-        });
-        getContentPane().add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 10, 50, 40));
-
+        jLabel31.setBackground(new java.awt.Color(45, 156, 35));
+        jLabel31.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel31.setForeground(new java.awt.Color(0, 0, 0));
         jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel31.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/x.png"))); // NOI18N
+        jLabel31.setText("X");
         jLabel31.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel31.setOpaque(true);
         jLabel31.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel31MouseClicked(evt);
             }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel31MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel31MouseExited(evt);
+            }
         });
-        getContentPane().add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 10, 40, 40));
+        getContentPane().add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 0, 40, 40));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.png"))); // NOI18N
         jLabel8.setCursor(new java.awt.Cursor(java.awt.Cursor.MOVE_CURSOR));
@@ -686,6 +733,8 @@ public class Plataforma extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("VENTAS", jPanel9);
 
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
         tblCventas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -736,6 +785,8 @@ public class Plataforma extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("COMPRABANTES", jPanel5);
 
+        jPanel13.setBackground(new java.awt.Color(255, 255, 255));
+
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
         jPanel13Layout.setHorizontalGroup(
@@ -748,6 +799,8 @@ public class Plataforma extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("REPORTES", jPanel13);
+
+        jPanel14.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel10.setText("Nombres");
 
@@ -900,6 +953,8 @@ public class Plataforma extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("EMPLEADOS", jPanel14);
+
+        jPanel15.setBackground(new java.awt.Color(255, 255, 255));
 
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1075,6 +1130,8 @@ public class Plataforma extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("CLIENTES", jPanel15);
+
+        jPanel16.setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
         jPanel16.setLayout(jPanel16Layout);
@@ -1409,15 +1466,10 @@ public class Plataforma extends javax.swing.JFrame {
 
     private void tblCventasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCventasMouseClicked
         int x = tblCventas.getSelectedRow();
-        String karma = "";
-        for (int i = 0; i < ventas.get(x).getDetalles().size(); i++) {
-            karma += "Producto = " + ventas.get(x).getDetalles().get(i).getProducto().getNombreProducto()
-                    + " - Precio = " + ventas.get(x).getDetalles().get(i).getProducto().getPrecioVenta()
-                    + " - Cantidad = " + ventas.get(x).getDetalles().get(i).getCantidad()
-                    + " - Importe = " + ventas.get(x).getDetalles().get(i).getImporte() + "\n";
-        }
-
-        JOptionPane.showMessageDialog(this, karma);
+        
+        actualizarTablaDetalle(x);
+        
+        jDialogDetalles.setVisible(true);
     }//GEN-LAST:event_tblCventasMouseClicked
 
     private void btnPmostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPmostrarActionPerformed
@@ -1602,6 +1654,10 @@ public class Plataforma extends javax.swing.JFrame {
 
     private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
         jTabbedPane1.setSelectedIndex(1);
+        int nRow = modeloDetalles.getRowCount();
+        for (int i = nRow - 1; i >= 0; i--) {
+            modeloDetalles.removeRow(i);
+        }
     }//GEN-LAST:event_jLabel14MouseClicked
 
     private void jLabel15MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel15MouseClicked
@@ -1623,7 +1679,9 @@ public class Plataforma extends javax.swing.JFrame {
     private void jLabel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel12MouseClicked
         int op = JOptionPane.showConfirmDialog(this, "¿Desea cerrar sesión?", "Salir", 0);
         if (op == 0) {
-            System.exit(0);
+            Login login = new Login();
+            login.setVisible(true);
+            this.dispose();
         }
     }//GEN-LAST:event_jLabel12MouseClicked
 
@@ -1698,10 +1756,6 @@ public class Plataforma extends javax.swing.JFrame {
     private void jLabel31MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel31MouseClicked
         System.exit(0);
     }//GEN-LAST:event_jLabel31MouseClicked
-
-    private void jLabel32MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel32MouseClicked
-        this.setExtendedState(ICONIFIED);
-    }//GEN-LAST:event_jLabel32MouseClicked
 
     private void rbtCnaturalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtCnaturalActionPerformed
         txtCruc.setEnabled(false);
@@ -1815,6 +1869,16 @@ public class Plataforma extends javax.swing.JFrame {
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void jLabel31MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel31MouseEntered
+        jLabel31.setBackground(Color.RED);
+        jLabel31.setForeground(Color.WHITE);
+    }//GEN-LAST:event_jLabel31MouseEntered
+
+    private void jLabel31MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel31MouseExited
+        jLabel31.setBackground(new Color(45,156,35));
+        jLabel31.setForeground(Color.BLACK);
+    }//GEN-LAST:event_jLabel31MouseExited
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1872,6 +1936,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JDialog jDialogClientes;
+    private javax.swing.JDialog jDialogDetalles;
     private javax.swing.JDialog jDialogproducto;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1898,7 +1963,6 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
@@ -1928,6 +1992,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JRadioButton rbtCjuridico;
     private javax.swing.JRadioButton rbtCnatural;
@@ -1935,6 +2000,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JTable tblClientesDialog;
     private javax.swing.JTable tblCventas;
     private javax.swing.JTable tblDetalles;
+    private javax.swing.JTable tblDetallesDialog;
     private javax.swing.JTable tblEmpleados;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTable tblProductosDialog;
