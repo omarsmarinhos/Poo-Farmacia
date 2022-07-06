@@ -36,6 +36,7 @@ public class Plataforma extends javax.swing.JFrame {
     int idProducto;
     int idEmpleado;
     int idCliente;
+    int idDetalle;
 
     public Plataforma(int id_empleado) {
         initComponents();
@@ -44,7 +45,7 @@ public class Plataforma extends javax.swing.JFrame {
         empleados = empleadoJDBC.select();
         clientes = clienteJDBC.select();
         productos = productoJDBC.select();
-        
+
         btnPactualizar.setEnabled(false);
         btnPeliminar.setEnabled(false);
 
@@ -53,6 +54,10 @@ public class Plataforma extends javax.swing.JFrame {
 
         actualizarEmpleadoActual(id_empleado);
 
+    }
+
+    private void actualizarEmpleadoActual(int id_empleado) {
+        txtUsuarioActivo.setText("" + empleadoJDBC.getEmpleadoActual(id_empleado));
     }
 
     private void iniciarTablas() {
@@ -82,17 +87,17 @@ public class Plataforma extends javax.swing.JFrame {
             modeloProdcutos.removeRow(i);
         }
 
-        for (int i = 0; i < productos.size(); i++) {
+        productos.forEach(producto -> {
             modeloProdcutos.addRow(new Object[]{
-                productos.get(i).getIdProducto(),
-                productos.get(i).getPresentacion(),
-                productos.get(i).getNombreProducto(),
-                productos.get(i).getConcentracion(),
-                productos.get(i).getStock(),
-                productos.get(i).getPrecioVenta(),
-                productos.get(i).getFechaVencimiento()
+                producto.getIdProducto(),
+                producto.getPresentacion(),
+                producto.getNombreProducto(),
+                producto.getConcentracion(),
+                producto.getStock(),
+                producto.getPrecioVenta(),
+                producto.getFechaVencimiento()
             });
-        }
+        });
     }
 
     private void actualizarTablaEmpleado() {
@@ -101,17 +106,17 @@ public class Plataforma extends javax.swing.JFrame {
             modeloEmpleados.removeRow(i);
         }
 
-        for (int i = 0; i < empleados.size(); i++) {
+        empleados.forEach(empleado -> {
             modeloEmpleados.addRow(new Object[]{
-                empleados.get(i).getidEmpleado(),
-                empleados.get(i).getNombre(),
-                empleados.get(i).getApellido(),
-                empleados.get(i).getDni(),
-                empleados.get(i).getTipoEmpleado(),
-                empleados.get(i).getSueldo(),
-                empleados.get(i).getCargo()
+                empleado.getidEmpleado(),
+                empleado.getNombre(),
+                empleado.getApellido(),
+                empleado.getDni(),
+                empleado.getTipoEmpleado(),
+                empleado.getSueldo(),
+                empleado.getCargo()
             });
-        }
+        });
     }
 
     private void actualizarTablaCliente() {
@@ -120,16 +125,16 @@ public class Plataforma extends javax.swing.JFrame {
             modeloClientes.removeRow(i);
         }
 
-        for (int i = 0; i < clientes.size(); i++) {
+        clientes.forEach(cliente -> {
             modeloClientes.addRow(new Object[]{
-                clientes.get(i).getIdCliente(),
-                clientes.get(i).getTipoPersona(),
-                clientes.get(i).getNombre(),
-                clientes.get(i).getApellido(),
-                clientes.get(i).getDni(),
-                clientes.get(i).getRuc(),
-                clientes.get(i).getRazonSocial(),});
-        }
+                cliente.getIdCliente(),
+                cliente.getTipoPersona(),
+                cliente.getNombre(),
+                cliente.getApellido(),
+                cliente.getDni(),
+                cliente.getRuc(),
+                cliente.getRazonSocial(),});
+        });
     }
 
     private void actualizarTablaVenta() {
@@ -138,16 +143,16 @@ public class Plataforma extends javax.swing.JFrame {
             modeloVentas.removeRow(i);
         }
 
-        for (int i = 0; i < ventas.size(); i++) {
+        ventas.forEach(venta -> {
             modeloVentas.addRow(new Object[]{
-                ventas.get(i).getIdVenta(),
-                ventas.get(i).getCliente().getIdCliente(),
-                ventas.get(i).getMetodoPago(),
-                ventas.get(i).getImporteTotal(),
-                ventas.get(i).getFecha(),});
-        }
+                venta.getIdVenta(),
+                venta.getCliente().getIdCliente(),
+                venta.getMetodoPago(),
+                venta.getImporteTotal(),
+                venta.getFecha(),});
+        });
     }
-    
+
     private void actualizarTablaDetalle(int x) {
         int nRow = modeloDetalles.getRowCount();
         for (int i = nRow - 1; i >= 0; i--) {
@@ -157,14 +162,28 @@ public class Plataforma extends javax.swing.JFrame {
         for (int i = 0; i < ventas.get(x).getDetalles().size(); i++) {
             modeloDetalles.addRow(new Object[]{
                 ventas.get(x).getDetalles().get(i).getProducto().getNombreProducto(),
-                ventas.get(i).getDetalles().get(i).getProducto().getPrecioVenta(),
-                ventas.get(i).getDetalles().get(i).getCantidad(),
-                ventas.get(i).getDetalles().get(i).getImporte(),});
+                ventas.get(x).getDetalles().get(i).getProducto().getPrecioVenta(),
+                ventas.get(x).getDetalles().get(i).getCantidad(),
+                ventas.get(x).getDetalles().get(i).getImporte(),});
         }
     }
+    
+    private void actualizarTablaDetalle(){
+        int nRow = modeloDetalles.getRowCount();
+        for (int i = nRow - 1; i >= 0; i--) {
+            modeloDetalles.removeRow(i);
+        }
+        float suma = 0;
+        for (int i = 0; i < detalles.size(); i++) {
+            modeloDetalles.addRow(new Object[]{
+                detalles.get(i).getProducto().getNombreProducto(),
+                detalles.get(i).getProducto().getPrecioVenta(),
+                detalles.get(i).getCantidad(),
+                detalles.get(i).getImporte(),});
+            suma += detalles.get(i).getImporte();
+        }
 
-    private void actualizarEmpleadoActual(int id_empleado) {
-        txtUsuarioActivo.setText("" + empleadoJDBC.getEmpleadoActual(id_empleado));
+        txtVmonto.setText("" + suma);
     }
 
     @SuppressWarnings("unchecked")
@@ -218,7 +237,7 @@ public class Plataforma extends javax.swing.JFrame {
         tblDetalles = new javax.swing.JTable();
         cmbVmetodoPago = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnVEliminar = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jLabel26 = new javax.swing.JLabel();
         txtVmonto = new javax.swing.JTextField();
@@ -287,7 +306,6 @@ public class Plataforma extends javax.swing.JFrame {
 
         jDialogClientes.setLocationByPlatform(true);
         jDialogClientes.setModal(true);
-        jDialogClientes.setPreferredSize(new java.awt.Dimension(600, 300));
         jDialogClientes.setResizable(false);
         jDialogClientes.setSize(new java.awt.Dimension(600, 300));
 
@@ -601,6 +619,11 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblDetalles.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblDetallesMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblDetalles);
 
         cmbVmetodoPago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Efectivo", "Tarjeta" }));
@@ -612,10 +635,11 @@ public class Plataforma extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("Eliminar");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnVEliminar.setText("Eliminar");
+        btnVEliminar.setEnabled(false);
+        btnVEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnVEliminarActionPerformed(evt);
             }
         });
 
@@ -689,7 +713,7 @@ public class Plataforma extends javax.swing.JFrame {
                             .addGroup(jPanel9Layout.createSequentialGroup()
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnVEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel9Layout.createSequentialGroup()
                                 .addComponent(jButton5)
                                 .addGap(199, 199, 199)
@@ -719,7 +743,7 @@ public class Plataforma extends javax.swing.JFrame {
                     .addComponent(cmbVmetodoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(31, 31, 31)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
+                    .addComponent(btnVEliminar)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1151,12 +1175,15 @@ public class Plataforma extends javax.swing.JFrame {
         jPanel7.setBackground(new java.awt.Color(225, 238, 230));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/usuario.png"))); // NOI18N
-        jPanel7.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 80, 90));
+        jPanel7.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 190, 90));
 
-        txtUsuarioActivo.setForeground(new java.awt.Color(102, 102, 102));
+        txtUsuarioActivo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtUsuarioActivo.setForeground(new java.awt.Color(0, 0, 0));
+        txtUsuarioActivo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         txtUsuarioActivo.setText("EDDY OLIVO AYALA");
-        jPanel7.add(txtUsuarioActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 120, 20));
+        jPanel7.add(txtUsuarioActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 190, 20));
 
         getContentPane().add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 190, 140));
 
@@ -1165,7 +1192,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel12.setBackground(new java.awt.Color(225, 238, 230));
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/cs.png"))); // NOI18N
-        jLabel12.setText("CERRAR SESION");
+        jLabel12.setText("CERRAR SESION      ");
         jLabel12.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel12.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jLabel12.setOpaque(true);
@@ -1184,7 +1211,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel13.setBackground(new java.awt.Color(225, 238, 230));
         jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/lupa.png"))); // NOI18N
-        jLabel13.setText("PRODUCTOS");
+        jLabel13.setText("PRODUCTOS        ");
         jLabel13.setToolTipText("");
         jLabel13.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel13.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
@@ -1242,7 +1269,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel16.setBackground(new java.awt.Color(225, 238, 230));
         jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/bolsa.png"))); // NOI18N
-        jLabel16.setText("???");
+        jLabel16.setText("???                           ");
         jLabel16.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel16.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jLabel16.setOpaque(true);
@@ -1261,7 +1288,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel17.setBackground(new java.awt.Color(225, 238, 230));
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/sorporte (1).png"))); // NOI18N
-        jLabel17.setText("EMPLEADOS");
+        jLabel17.setText("EMPLEADOS           ");
         jLabel17.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel17.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jLabel17.setOpaque(true);
@@ -1280,7 +1307,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel23.setBackground(new java.awt.Color(225, 238, 230));
         jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel23.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/sorporte (1).png"))); // NOI18N
-        jLabel23.setText("CLIENTES");
+        jLabel23.setText("CLIENTES                 ");
         jLabel23.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel23.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jLabel23.setOpaque(true);
@@ -1299,7 +1326,7 @@ public class Plataforma extends javax.swing.JFrame {
         jLabel24.setBackground(new java.awt.Color(225, 238, 230));
         jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel24.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/sorporte (1).png"))); // NOI18N
-        jLabel24.setText("USUARIOS");
+        jLabel24.setText("USUARIOS                 ");
         jLabel24.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel24.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jLabel24.setOpaque(true);
@@ -1399,8 +1426,6 @@ public class Plataforma extends javax.swing.JFrame {
         int cantidad = Integer.parseInt(txtVcantidad.getText());
         int posPro = 0;
 
-        
-
         for (int i = 0; i < productos.size(); i++) {
             if (productos.get(i).getIdProducto() == idProductoo) {
                 posPro = i;
@@ -1408,17 +1433,14 @@ public class Plataforma extends javax.swing.JFrame {
             }
         }
 
-        
-
-        float suma = 0;
-
         detalles.add(new DetalleVenta(productos.get(posPro), cantidad));
 
         int nRow = modeloDetalles.getRowCount();
         for (int i = nRow - 1; i >= 0; i--) {
             modeloDetalles.removeRow(i);
         }
-
+        
+        float suma = 0;
         for (int i = 0; i < detalles.size(); i++) {
             modeloDetalles.addRow(new Object[]{
                 detalles.get(i).getProducto().getNombreProducto(),
@@ -1430,7 +1452,6 @@ public class Plataforma extends javax.swing.JFrame {
 
         txtVmonto.setText("" + suma);
 
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -1438,37 +1459,41 @@ public class Plataforma extends javax.swing.JFrame {
         int idClientee = Integer.parseInt(txtVcliente.getText());
         int posCli = 0;
         int posEmp = 0;
-        
+
         for (int i = 0; i < clientes.size(); i++) {
             if (clientes.get(i).getIdCliente() == idClientee) {
                 posCli = i;
                 break;
             }
         }
-        
+
         for (int i = 0; i < empleados.size(); i++) {
-            if (empleados.get(i).getidEmpleado()== idEmpleado) {
+            if (empleados.get(i).getidEmpleado() == idEmpleado) {
                 posEmp = i;
                 break;
             }
         }
-        
+
         String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
-        
+
         ventaJDBC.insert(new Venta(empleados.get(posEmp),
                 clientes.get(posCli), detalles, metodoPago));
-        
+
         detalles = new ArrayList<>();
         JOptionPane.showMessageDialog(this, "Venta procesada");
 
+        int nRow = modeloDetalles.getRowCount();
+        for (int i = nRow - 1; i >= 0; i--) {
+            modeloDetalles.removeRow(i);
+        }
 
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void tblCventasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCventasMouseClicked
         int x = tblCventas.getSelectedRow();
-        
+
         actualizarTablaDetalle(x);
-        
+
         jDialogDetalles.setVisible(true);
     }//GEN-LAST:event_tblCventasMouseClicked
 
@@ -1644,9 +1669,12 @@ public class Plataforma extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtEsueldoKeyTyped
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void btnVEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVEliminarActionPerformed
+        detalles.remove(idDetalle);
+        btnVEliminar.setEnabled(false);
+        actualizarTablaDetalle();
+        
+    }//GEN-LAST:event_btnVEliminarActionPerformed
 
     private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
         jTabbedPane1.setSelectedIndex(0);
@@ -1875,9 +1903,14 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel31MouseEntered
 
     private void jLabel31MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel31MouseExited
-        jLabel31.setBackground(new Color(45,156,35));
+        jLabel31.setBackground(new Color(45, 156, 35));
         jLabel31.setForeground(Color.BLACK);
     }//GEN-LAST:event_jLabel31MouseExited
+
+    private void tblDetallesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDetallesMouseClicked
+        idDetalle = tblDetalles.getSelectedRow();
+        btnVEliminar.setEnabled(true);
+    }//GEN-LAST:event_tblDetallesMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -1924,13 +1957,13 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton btnPeliminar;
     private javax.swing.JButton btnPmostrar;
     public static javax.swing.JButton btnPregistrar;
+    private javax.swing.JButton btnVEliminar;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cmbEtipoEmpleado;
     private javax.swing.JComboBox<String> cmbPpresentacion;
     private javax.swing.JComboBox<String> cmbVmetodoPago;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
