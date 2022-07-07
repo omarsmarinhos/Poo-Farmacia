@@ -12,6 +12,8 @@ public class Login extends javax.swing.JFrame {
 
     public Login() {
         initComponents();
+        System.out.println("User: admin");
+        System.out.println("Pass: omar");
     }
 
     String MD5(String md5) {
@@ -243,6 +245,8 @@ public class Login extends javax.swing.JFrame {
             
         } catch (SQLException ex) {
             System.out.println("Error-Usuario" + ex.toString());
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(this, "Usuario no existe");
         }
     }//GEN-LAST:event_btnIngresarMouseClicked
 
