@@ -12,7 +12,8 @@ private int stock;
 private float precioVenta;
 private String fechaVencimiento;
 
-    public Producto() {
+    public Producto(int idProducto) {
+        this.idProducto = idProducto;
     }
 
     public Producto(String presentacion, String nombreProducto, String concentracion, int stock, float precioVenta, String fechaVencimiento) {
