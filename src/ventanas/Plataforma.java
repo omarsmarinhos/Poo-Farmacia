@@ -6,13 +6,20 @@ import clases.Empleado;
 import clases.Producto;
 import clases.Venta;
 import conexion.ClienteJDBC;
+import conexion.Conexion;
 import conexion.EmpleadoJDBC;
 import conexion.ProductoJDBC;
 import conexion.VentaJDBC;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,6 +50,8 @@ public class Plataforma extends javax.swing.JFrame {
     int idCliente;
     int idDetalle;
     Map atributeas;
+    Color colorEntrar = new Color(34,117,26);
+    Color colorSalir = new Color(45,156,35);
 
     public Plataforma(int id_empleado) {
         initComponents();
@@ -63,14 +72,14 @@ public class Plataforma extends javax.swing.JFrame {
 
         actualizarEmpleadoActual(id_empleado);
 
-        //Provisional
-        sec01.setBackground(new Color(19, 66, 15));
-        select01.setBackground(new Color(255, 255, 255));
-
         //Hacer esto a todas las tablas
         tblCventas.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
         tblCventas.getTableHeader().setForeground(Color.BLACK);
         tblCventas.setRowHeight(25);
+        
+        tblCventasReporte.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
+        tblCventasReporte.getTableHeader().setForeground(Color.BLACK);
+        tblCventasReporte.setRowHeight(25);
         
         tblProductos.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
         tblProductos.getTableHeader().setForeground(Color.BLACK);
@@ -105,6 +114,7 @@ public class Plataforma extends javax.swing.JFrame {
         tblClientesDialog.setModel(modeloClientes);
         tblProductosDialog.setModel(modeloProdcutos);
         tblDetallesDialog.setModel(modeloDetalles);
+        tblCventasReporte.setModel(modeloVentas);
     }
 
     private void actualizarTablaProducto() {
@@ -284,6 +294,13 @@ public class Plataforma extends javax.swing.JFrame {
         tblCventas = new javax.swing.JTable();
         btnVactualizar = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblCventasReporte = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        btnVactualizarReporte = new javax.swing.JButton();
         jPanel14 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -333,14 +350,6 @@ public class Plataforma extends javax.swing.JFrame {
         sec06 = new javax.swing.JLabel();
         sec07 = new javax.swing.JLabel();
         sec08 = new javax.swing.JLabel();
-        select01 = new javax.swing.JLabel();
-        select02 = new javax.swing.JLabel();
-        select03 = new javax.swing.JLabel();
-        select04 = new javax.swing.JLabel();
-        select05 = new javax.swing.JLabel();
-        select06 = new javax.swing.JLabel();
-        select07 = new javax.swing.JLabel();
-        select08 = new javax.swing.JLabel();
 
         jDialogClientes.setTitle("Seleccionar un cliente");
         jDialogClientes.setLocationByPlatform(true);
@@ -477,7 +486,7 @@ public class Plataforma extends javax.swing.JFrame {
         });
         getContentPane().add(btnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 0, 40, 40));
 
-        jPanel7.setBackground(new java.awt.Color(13, 44, 10));
+        jPanel7.setBackground(new java.awt.Color(45, 156, 35));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         foto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -820,7 +829,6 @@ public class Plataforma extends javax.swing.JFrame {
         tblCventas.setFocusable(false);
         tblCventas.setGridColor(new java.awt.Color(51, 51, 51));
         tblCventas.setRowHeight(25);
-        tblCventas.setRowMargin(1);
         tblCventas.setSelectionBackground(new java.awt.Color(62, 131, 42));
         tblCventas.getTableHeader().setResizingAllowed(false);
         tblCventas.getTableHeader().setReorderingAllowed(false);
@@ -854,6 +862,88 @@ public class Plataforma extends javax.swing.JFrame {
 
         jPanel13.setBackground(new java.awt.Color(255, 255, 255));
         jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jScrollPane8.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane8.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
+
+        tblCventasReporte.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        tblCventasReporte.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tblCventasReporte.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblCventasReporte.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblCventasReporte.setFocusable(false);
+        tblCventasReporte.setGridColor(new java.awt.Color(51, 51, 51));
+        tblCventasReporte.setRowHeight(25);
+        tblCventasReporte.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblCventasReporte.getTableHeader().setResizingAllowed(false);
+        tblCventasReporte.getTableHeader().setReorderingAllowed(false);
+        tblCventasReporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCventasReporteMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(tblCventasReporte);
+
+        jPanel13.add(jScrollPane8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 820, 370));
+
+        jButton1.setText("Generar reporte de Quincena");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel13.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 470, -1, -1));
+
+        jButton3.setText("Generar reporte de Dia");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel13.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, -1));
+
+        jButton4.setText("Generar reporte de Semana");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel13.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 470, -1, -1));
+
+        jButton5.setText("Generar reporte de Mes");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel13.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 470, -1, -1));
+
+        btnVactualizarReporte.setBackground(new java.awt.Color(62, 131, 42));
+        btnVactualizarReporte.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnVactualizarReporte.setForeground(new java.awt.Color(255, 255, 255));
+        btnVactualizarReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
+        btnVactualizarReporte.setText("Actualizar");
+        btnVactualizarReporte.setToolTipText("");
+        btnVactualizarReporte.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnVactualizarReporte.setBorderPainted(false);
+        btnVactualizarReporte.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVactualizarReporte.setFocusPainted(false);
+        btnVactualizarReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVactualizarReporteActionPerformed(evt);
+            }
+        });
+        jPanel13.add(btnVactualizarReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 510, 180, 40));
+
         jTabbedPane1.addTab("REPORTES", jPanel13);
 
         jPanel14.setBackground(new java.awt.Color(255, 255, 255));
@@ -1092,14 +1182,15 @@ public class Plataforma extends javax.swing.JFrame {
 
         getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, 910, 650));
 
-        jPanel10.setBackground(new java.awt.Color(13, 44, 10));
+        jPanel10.setBackground(new java.awt.Color(45, 156, 35));
         jPanel10.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        sec01.setBackground(new java.awt.Color(13, 44, 10));
+        sec01.setBackground(new java.awt.Color(45, 156, 35));
         sec01.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec01.setForeground(new java.awt.Color(255, 255, 255));
         sec01.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec01.setText("Productos");
+        sec01.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-medical-13-32.png"))); // NOI18N
+        sec01.setText("  Productos     ");
         sec01.setToolTipText("");
         sec01.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec01.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
@@ -1115,13 +1206,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec01MouseExited(evt);
             }
         });
-        jPanel10.add(sec01, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 180, 50));
+        jPanel10.add(sec01, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 50));
 
-        sec02.setBackground(new java.awt.Color(13, 44, 10));
+        sec02.setBackground(new java.awt.Color(45, 156, 35));
         sec02.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec02.setForeground(new java.awt.Color(255, 255, 255));
         sec02.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec02.setText("Carrito");
+        sec02.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-shopping-cart-26-32.png"))); // NOI18N
+        sec02.setText("  Carrito         ");
         sec02.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec02.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec02.setOpaque(true);
@@ -1136,13 +1228,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec02MouseExited(evt);
             }
         });
-        jPanel10.add(sec02, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 180, 50));
+        jPanel10.add(sec02, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 190, 50));
 
-        sec03.setBackground(new java.awt.Color(13, 44, 10));
+        sec03.setBackground(new java.awt.Color(45, 156, 35));
         sec03.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec03.setForeground(new java.awt.Color(255, 255, 255));
         sec03.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec03.setText("Ventas");
+        sec03.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-marketing-2-32.png"))); // NOI18N
+        sec03.setText("  Ventas         ");
         sec03.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec03.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec03.setOpaque(true);
@@ -1157,13 +1250,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec03MouseExited(evt);
             }
         });
-        jPanel10.add(sec03, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 180, 50));
+        jPanel10.add(sec03, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 190, 50));
 
-        sec04.setBackground(new java.awt.Color(13, 44, 10));
+        sec04.setBackground(new java.awt.Color(45, 156, 35));
         sec04.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec04.setForeground(new java.awt.Color(255, 255, 255));
         sec04.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec04.setText("Reportes");
+        sec04.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-task-list-square-lined-32.png"))); // NOI18N
+        sec04.setText("  Reportes      ");
         sec04.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec04.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec04.setOpaque(true);
@@ -1178,13 +1272,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec04MouseExited(evt);
             }
         });
-        jPanel10.add(sec04, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 180, 50));
+        jPanel10.add(sec04, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 190, 50));
 
-        sec05.setBackground(new java.awt.Color(13, 44, 10));
+        sec05.setBackground(new java.awt.Color(45, 156, 35));
         sec05.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec05.setForeground(new java.awt.Color(255, 255, 255));
         sec05.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec05.setText("Empleados");
+        sec05.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-user-17-32.png"))); // NOI18N
+        sec05.setText("  Empleados   ");
         sec05.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec05.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec05.setOpaque(true);
@@ -1199,13 +1294,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec05MouseExited(evt);
             }
         });
-        jPanel10.add(sec05, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 180, 50));
+        jPanel10.add(sec05, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 190, 50));
 
-        sec06.setBackground(new java.awt.Color(13, 44, 10));
+        sec06.setBackground(new java.awt.Color(45, 156, 35));
         sec06.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec06.setForeground(new java.awt.Color(255, 255, 255));
         sec06.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec06.setText("Clientes");
+        sec06.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-customer-12-32.png"))); // NOI18N
+        sec06.setText("  Clientes        ");
         sec06.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec06.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec06.setOpaque(true);
@@ -1220,13 +1316,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec06MouseExited(evt);
             }
         });
-        jPanel10.add(sec06, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 180, 50));
+        jPanel10.add(sec06, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 250, 190, 50));
 
-        sec07.setBackground(new java.awt.Color(13, 44, 10));
+        sec07.setBackground(new java.awt.Color(45, 156, 35));
         sec07.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec07.setForeground(new java.awt.Color(255, 255, 255));
         sec07.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec07.setText("Usuarios");
+        sec07.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-user-circle-thin-32.png"))); // NOI18N
+        sec07.setText("  Usuarios        ");
         sec07.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec07.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec07.setOpaque(true);
@@ -1241,13 +1338,14 @@ public class Plataforma extends javax.swing.JFrame {
                 sec07MouseExited(evt);
             }
         });
-        jPanel10.add(sec07, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 180, 50));
+        jPanel10.add(sec07, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 300, 190, 50));
 
-        sec08.setBackground(new java.awt.Color(13, 44, 10));
+        sec08.setBackground(new java.awt.Color(45, 156, 35));
         sec08.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         sec08.setForeground(new java.awt.Color(255, 255, 255));
         sec08.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        sec08.setText("Cerrar Sesión");
+        sec08.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-log-out-12-32.png"))); // NOI18N
+        sec08.setText("  Cerrar Sesión");
         sec08.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         sec08.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         sec08.setOpaque(true);
@@ -1262,39 +1360,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec08MouseExited(evt);
             }
         });
-        jPanel10.add(sec08, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 180, 50));
-
-        select01.setBackground(new java.awt.Color(13, 44, 10));
-        select01.setOpaque(true);
-        jPanel10.add(select01, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 5, 50));
-
-        select02.setBackground(new java.awt.Color(13, 44, 10));
-        select02.setOpaque(true);
-        jPanel10.add(select02, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 5, 50));
-
-        select03.setBackground(new java.awt.Color(13, 44, 10));
-        select03.setOpaque(true);
-        jPanel10.add(select03, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 5, 50));
-
-        select04.setBackground(new java.awt.Color(13, 44, 10));
-        select04.setOpaque(true);
-        jPanel10.add(select04, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 5, 50));
-
-        select05.setBackground(new java.awt.Color(13, 44, 10));
-        select05.setOpaque(true);
-        jPanel10.add(select05, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 5, 50));
-
-        select06.setBackground(new java.awt.Color(13, 44, 10));
-        select06.setOpaque(true);
-        jPanel10.add(select06, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 250, 5, 50));
-
-        select07.setBackground(new java.awt.Color(13, 44, 10));
-        select07.setOpaque(true);
-        jPanel10.add(select07, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 300, 5, 50));
-
-        select08.setBackground(new java.awt.Color(13, 44, 10));
-        select08.setOpaque(true);
-        jPanel10.add(select08, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 350, 5, 50));
+        jPanel10.add(sec08, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 350, 190, 50));
 
         getContentPane().add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 190, 480));
 
@@ -1604,55 +1670,6 @@ public class Plataforma extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnEliminarElementoCarritoActionPerformed
 
-    private void sec01MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseClicked
-        panelSeleccionado(sec01, select01);
-        jTabbedPane1.setSelectedIndex(0);
-    }//GEN-LAST:event_sec01MouseClicked
-
-    private void sec02MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseClicked
-        panelSeleccionado(sec02, select02);
-        jTabbedPane1.setSelectedIndex(1);
-        int nRow = modeloDetalles.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloDetalles.removeRow(i);
-        }
-    }//GEN-LAST:event_sec02MouseClicked
-
-    private void sec03MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseClicked
-        panelSeleccionado(sec03, select03);
-        jTabbedPane1.setSelectedIndex(2);
-    }//GEN-LAST:event_sec03MouseClicked
-
-    private void sec04MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec04MouseClicked
-        panelSeleccionado(sec04, select04);
-        jTabbedPane1.setSelectedIndex(3);
-    }//GEN-LAST:event_sec04MouseClicked
-
-    private void sec05MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec05MouseClicked
-        panelSeleccionado(sec05, select05);
-        jTabbedPane1.setSelectedIndex(4);
-    }//GEN-LAST:event_sec05MouseClicked
-
-    private void sec06MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec06MouseClicked
-        panelSeleccionado(sec06, select06);
-        jTabbedPane1.setSelectedIndex(5);
-    }//GEN-LAST:event_sec06MouseClicked
-
-    private void sec08MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec08MouseClicked
-
-        int op = JOptionPane.showConfirmDialog(this, "¿Desea cerrar sesión?", "Salir", 0);
-        if (op == 0) {
-            Login login = new Login();
-            login.setVisible(true);
-            this.dispose();
-        }
-    }//GEN-LAST:event_sec08MouseClicked
-
-    private void sec07MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec07MouseClicked
-        panelSeleccionado(sec07, select07);
-        jTabbedPane1.setSelectedIndex(6);
-    }//GEN-LAST:event_sec07MouseClicked
-
     private void btnSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSalirMouseClicked
         System.exit(0);
     }//GEN-LAST:event_btnSalirMouseClicked
@@ -1805,67 +1822,67 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_tblDetallesMouseClicked
 
     private void sec01MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseEntered
-        sec01.setFont(sec01.getFont().deriveFont(atributeas));
+        sec01.setBackground(colorEntrar);
     }//GEN-LAST:event_sec01MouseEntered
 
     private void sec01MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseExited
-        sec01.setFont(sec02.getFont());
+        sec01.setBackground(colorSalir);
     }//GEN-LAST:event_sec01MouseExited
 
     private void sec02MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseEntered
-        sec02.setFont(sec01.getFont().deriveFont(atributeas));
+        sec02.setBackground(colorEntrar);
     }//GEN-LAST:event_sec02MouseEntered
 
     private void sec02MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseExited
-        sec02.setFont(sec01.getFont());
+        sec02.setBackground(colorSalir);
     }//GEN-LAST:event_sec02MouseExited
 
     private void sec03MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseEntered
-        sec03.setFont(sec01.getFont().deriveFont(atributeas));
+        sec03.setBackground(colorEntrar);
     }//GEN-LAST:event_sec03MouseEntered
 
     private void sec03MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseExited
-        sec03.setFont(sec02.getFont());
+        sec03.setBackground(colorSalir);
     }//GEN-LAST:event_sec03MouseExited
 
     private void sec04MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec04MouseEntered
-        sec04.setFont(sec01.getFont().deriveFont(atributeas));
+        sec04.setBackground(colorEntrar);
     }//GEN-LAST:event_sec04MouseEntered
 
     private void sec04MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec04MouseExited
-        sec04.setFont(sec02.getFont());
+        sec04.setBackground(colorSalir);
     }//GEN-LAST:event_sec04MouseExited
 
     private void sec05MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec05MouseEntered
-        sec05.setFont(sec01.getFont().deriveFont(atributeas));
+        sec05.setBackground(colorEntrar);
     }//GEN-LAST:event_sec05MouseEntered
 
     private void sec05MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec05MouseExited
-        sec05.setFont(sec02.getFont());
+        sec05.setBackground(colorSalir);
     }//GEN-LAST:event_sec05MouseExited
 
     private void sec06MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec06MouseEntered
-        sec06.setFont(sec01.getFont().deriveFont(atributeas));
+        sec06.setBackground(colorEntrar);
     }//GEN-LAST:event_sec06MouseEntered
 
     private void sec06MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec06MouseExited
-        sec06.setFont(sec02.getFont());
+        sec06.setBackground(colorSalir);
     }//GEN-LAST:event_sec06MouseExited
 
     private void sec07MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec07MouseEntered
-        sec07.setFont(sec01.getFont().deriveFont(atributeas));
+        sec07.setBackground(colorEntrar);
     }//GEN-LAST:event_sec07MouseEntered
 
     private void sec07MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec07MouseExited
-        sec07.setFont(sec02.getFont());
+        sec07.setBackground(colorSalir);
     }//GEN-LAST:event_sec07MouseExited
 
     private void sec08MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec08MouseEntered
-        sec08.setFont(sec01.getFont().deriveFont(atributeas));
+        sec08.setBackground(colorEntrar);
     }//GEN-LAST:event_sec08MouseEntered
 
     private void sec08MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec08MouseExited
-        sec08.setFont(sec02.getFont());
+        sec08.setBackground(colorSalir);
     }//GEN-LAST:event_sec08MouseExited
 
     private void txtEnombresKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEnombresKeyTyped
@@ -1893,6 +1910,78 @@ public class Plataforma extends javax.swing.JFrame {
         validarSoloNumeros(evt);
         limitarEntradaDatos(txtCruc, 11, evt);
     }//GEN-LAST:event_txtCrucKeyTyped
+
+    private void tblCventasReporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCventasReporteMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblCventasReporteMouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        
+        ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
+        
+        ventas.forEach(venta -> System.out.println(venta + "\n"));
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
+        
+        ventas.forEach(venta -> System.out.println(venta + "\n"));
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void btnVactualizarReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVactualizarReporteActionPerformed
+        ventas = ventaJDBC.select(empleados, clientes, productos);
+        actualizarTablaVenta();    
+    }//GEN-LAST:event_btnVactualizarReporteActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
+        
+        ventas.forEach(venta -> System.out.println(venta + "\n"));
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
+        
+        ventas.forEach(venta -> System.out.println(venta + "\n"));
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void sec01MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseClicked
+        jTabbedPane1.setSelectedIndex(0);
+    }//GEN-LAST:event_sec01MouseClicked
+
+    private void sec02MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseClicked
+        jTabbedPane1.setSelectedIndex(1);
+    }//GEN-LAST:event_sec02MouseClicked
+
+    private void sec03MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseClicked
+        jTabbedPane1.setSelectedIndex(2);
+    }//GEN-LAST:event_sec03MouseClicked
+
+    private void sec04MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec04MouseClicked
+        jTabbedPane1.setSelectedIndex(3);
+    }//GEN-LAST:event_sec04MouseClicked
+
+    private void sec05MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec05MouseClicked
+        jTabbedPane1.setSelectedIndex(4);
+    }//GEN-LAST:event_sec05MouseClicked
+
+    private void sec06MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec06MouseClicked
+        jTabbedPane1.setSelectedIndex(5);
+    }//GEN-LAST:event_sec06MouseClicked
+
+    private void sec07MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec07MouseClicked
+        jTabbedPane1.setSelectedIndex(6);
+    }//GEN-LAST:event_sec07MouseClicked
+
+    private void sec08MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec08MouseClicked
+        int op = JOptionPane.showConfirmDialog(this, "¿Desea cerrar sesión?", "Salir", 0);
+        if (op == 0) {
+            Login login = new Login();
+            login.setVisible(true);
+            this.dispose();
+        }
+    }//GEN-LAST:event_sec08MouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -1935,14 +2024,7 @@ public class Plataforma extends javax.swing.JFrame {
         sec06.setBackground(new Color(13, 44, 10));
         sec07.setBackground(new Color(13, 44, 10));
         sec08.setBackground(new Color(13, 44, 10));
-        select01.setBackground(new Color(13, 44, 10));
-        select02.setBackground(new Color(13, 44, 10));
-        select03.setBackground(new Color(13, 44, 10));
-        select04.setBackground(new Color(13, 44, 10));
-        select05.setBackground(new Color(13, 44, 10));
-        select06.setBackground(new Color(13, 44, 10));
-        select07.setBackground(new Color(13, 44, 10));
-        select08.setBackground(new Color(13, 44, 10));
+        
         sec.setBackground(new Color(19, 66, 15));
         select.setBackground(new Color(255, 255, 255));
     }
@@ -1992,13 +2074,18 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton btnSelecCliente;
     private javax.swing.JButton btnSelectProducto;
     private javax.swing.JButton btnVactualizar;
+    private javax.swing.JButton btnVactualizarReporte;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel cabecera;
     private javax.swing.JComboBox<String> cmbEtipoEmpleado;
     private javax.swing.JComboBox<String> cmbPpresentacion;
     private javax.swing.JComboBox<String> cmbVmetodoPago;
     private javax.swing.JLabel foto;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JDialog jDialogClientes;
     private javax.swing.JDialog jDialogDetalles;
     private javax.swing.JDialog jDialogproducto;
@@ -2042,6 +2129,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -2060,17 +2148,10 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel sec06;
     private javax.swing.JLabel sec07;
     private javax.swing.JLabel sec08;
-    private javax.swing.JLabel select01;
-    private javax.swing.JLabel select02;
-    private javax.swing.JLabel select03;
-    private javax.swing.JLabel select04;
-    private javax.swing.JLabel select05;
-    private javax.swing.JLabel select06;
-    private javax.swing.JLabel select07;
-    private javax.swing.JLabel select08;
     private javax.swing.JTable tblClientes;
     private javax.swing.JTable tblClientesDialog;
     private javax.swing.JTable tblCventas;
+    private javax.swing.JTable tblCventasReporte;
     private javax.swing.JTable tblDetalles;
     private javax.swing.JTable tblDetallesDialog;
     private javax.swing.JTable tblEmpleados;

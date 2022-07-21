@@ -14,14 +14,19 @@ public class ProductoJDBC implements ProductoDao{
             + "nombre_producto=?, concentracion=?, stock=?, precio_venta=?, fecha_vencimiento=? "
             + "WHERE id_producto = ?";
     private static final String SQL_DELETE = "DELETE FROM productos WHERE id_producto=?";
+    
+    private Connection connection;
+    private PreparedStatement preparedStatement;
+    private Statement statement;
 
     @Override
     public ArrayList<Producto> select() {
         ArrayList<Producto> productos = new ArrayList<>();
         try {
-            Statement sql = Conexion.getConexion().createStatement();
+            connection = Conexion.getConexion();
+            statement = connection.createStatement();
             String query = SQL_SELECT;
-            ResultSet rs = sql.executeQuery(query);
+            ResultSet rs = statement.executeQuery(query);
 
             while (rs.next()) {
                 productos.add(new Producto(
@@ -34,7 +39,8 @@ public class ProductoJDBC implements ProductoDao{
                         rs.getString("fecha_vencimiento")));
             }
             rs.close();
-            sql.close();
+            statement.close();
+            connection.close();
             System.out.println("Productos-obtenidos");
         } catch (SQLException ex) {
             System.out.println("Error-getProductosDB" + ex.toString());
@@ -46,16 +52,18 @@ public class ProductoJDBC implements ProductoDao{
     @Override
     public void insert(Producto producto) {
         try {
-            PreparedStatement stmt = Conexion.getConexion().prepareStatement(SQL_INSERT);
-            stmt.setString(1, producto.getPresentacion());
-            stmt.setString(2, producto.getNombreProducto());
-            stmt.setString(3, producto.getConcentracion());
-            stmt.setInt(4, producto.getStock());
-            stmt.setFloat(5, producto.getPrecioVenta());
-            stmt.setString(6, producto.getFechaVencimiento());
+            connection = Conexion.getConexion();
+            preparedStatement = connection.prepareStatement(SQL_INSERT);
+            preparedStatement.setString(1, producto.getPresentacion());
+            preparedStatement.setString(2, producto.getNombreProducto());
+            preparedStatement.setString(3, producto.getConcentracion());
+            preparedStatement.setInt(4, producto.getStock());
+            preparedStatement.setFloat(5, producto.getPrecioVenta());
+            preparedStatement.setString(6, producto.getFechaVencimiento());
 
-            stmt.executeUpdate();
-            stmt.close();
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
             System.out.println("Producto-agregado:");
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -64,20 +72,21 @@ public class ProductoJDBC implements ProductoDao{
 
     @Override
     public void update(Producto producto) {
-        PreparedStatement stmt = null;
         try {
-            stmt = Conexion.getConexion().prepareStatement(SQL_UPDATE);
-            stmt.setString(1, producto.getPresentacion());
-            stmt.setString(2, producto.getNombreProducto());
-            stmt.setString(3, producto.getConcentracion());
-            stmt.setInt(4, producto.getStock());
-            stmt.setFloat(5, producto.getPrecioVenta());
-            stmt.setString(6, producto.getFechaVencimiento());
-            stmt.setInt(7, producto.getIdProducto());
+            connection = Conexion.getConexion();
+            preparedStatement = connection.prepareStatement(SQL_UPDATE);
+            preparedStatement.setString(1, producto.getPresentacion());
+            preparedStatement.setString(2, producto.getNombreProducto());
+            preparedStatement.setString(3, producto.getConcentracion());
+            preparedStatement.setInt(4, producto.getStock());
+            preparedStatement.setFloat(5, producto.getPrecioVenta());
+            preparedStatement.setString(6, producto.getFechaVencimiento());
+            preparedStatement.setInt(7, producto.getIdProducto());
 
-            stmt.executeUpdate();
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
             System.out.println("Prodcuto-actualizado:");
-            stmt.close();
 
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -87,13 +96,15 @@ public class ProductoJDBC implements ProductoDao{
 
     @Override
     public void delete(Producto producto) {
-        PreparedStatement stmt = null;
         try {
-            stmt = Conexion.getConexion().prepareStatement(SQL_DELETE);
-            stmt.setInt(1, producto.getIdProducto());
-            stmt.executeUpdate();
+            connection = Conexion.getConexion();
+            preparedStatement = connection.prepareStatement(SQL_DELETE);
+            preparedStatement.setInt(1, producto.getIdProducto());
+            preparedStatement.executeUpdate();
+            
+            preparedStatement.close();
+            connection.close();
             System.out.println("Producto-eliminado");
-            stmt.close();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         } 
@@ -102,11 +113,11 @@ public class ProductoJDBC implements ProductoDao{
     @Override
     public ArrayList<Producto> search(String string){
         ArrayList<Producto> productos = new ArrayList<>();
-        Statement stmt = null;
         try {
-            stmt = Conexion.getConexion().createStatement();
+            connection = Conexion.getConexion();
+            statement = connection.createStatement();
             String query = "SELECT * FROM productos WHERE nombre_producto LIKE '" + string + "%'";
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 productos.add(new Producto(
                         rs.getInt("id_producto"),
@@ -118,7 +129,8 @@ public class ProductoJDBC implements ProductoDao{
                         rs.getString("fecha_vencimiento")));
             }
             rs.close();
-            stmt.close();
+            statement.close();
+            connection.close();
             System.out.println("Producto-buscado");
         } catch (SQLException ex) {
             System.out.println("Error-buscarProdcuto" + ex.toString());

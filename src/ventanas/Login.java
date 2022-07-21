@@ -3,6 +3,7 @@ package ventanas;
 import conexion.Conexion;
 import java.awt.Color;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -222,7 +223,8 @@ public class Login extends javax.swing.JFrame {
         String user = txtUser.getText();
         String pass = String.valueOf(txtPassword.getPassword());
         try {
-            Statement sql = Conexion.getConexion().createStatement();
+            Connection con = Conexion.getConexion();
+            Statement sql = con.createStatement();
             String query = "SELECT id_empleado, user, password FROM usuarios WHERE user = '" + user + "'";
             ResultSet rs = sql.executeQuery(query);
 
@@ -231,6 +233,7 @@ public class Login extends javax.swing.JFrame {
                 System.out.println("" + id_empleado);
                 String passDB = rs.getString("password");
                 if (passDB.equals(MD5(pass))) {
+                    
                     System.out.println("Usuario-obtenido");
                     Plataforma p = new Plataforma(id_empleado);
                     p.setVisible(true);
@@ -242,7 +245,7 @@ public class Login extends javax.swing.JFrame {
 
             rs.close();
             sql.close();
-            
+            con.close();
         } catch (SQLException ex) {
             System.out.println("Error-Usuario" + ex.toString());
         } catch (Exception ex){

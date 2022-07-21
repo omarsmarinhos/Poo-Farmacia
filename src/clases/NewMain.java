@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import conexion.ProductoJDBC;
+import conexion.VentaJDBC;
 
 public class NewMain {
 
@@ -19,12 +20,16 @@ public class NewMain {
     
     public static void main(String[] args) {
         
-//        ProductoJDBC productoJDBC = new ProductoJDBC();
-//        productos = productoJDBC.select();
+        VentaJDBC ventajdbc = new VentaJDBC();
+        ProductoJDBC productoJDBC = new ProductoJDBC();
+        productos = productoJDBC.select();
         //Obtener datos de la base de Datos
-        //getProductosDB();
-        //getEmpleadosDB();
-        //getClientesDB();
+//        getProductosDB();
+//        getEmpleadosDB();
+        getClientesDB();
+        
+//                ventas = ventajdbc.selectVentaDia(empleados, clientes, productos, dia);
+
         //getVentasDB();
 //        productos.forEach(producto -> System.out.println(producto));
 //        empleados.forEach(empleado -> System.out.println(empleado));

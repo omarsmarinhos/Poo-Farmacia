@@ -1,6 +1,7 @@
 package conexion;
 
 import clases.Cliente;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,13 +18,18 @@ public class ClienteJDBC implements ClienteDAO{
             + "WHERE id_cliente = ?";
     private static final String SQL_DELETE = "DELETE FROM cliente WHERE id_cliente=?";
     
+    private Connection connection;
+    private PreparedStatement preparedStatement;
+    private Statement statement;
+    
     @Override
     public ArrayList<Cliente> select(){
         ArrayList<Cliente> clientes = new ArrayList<>();
         try {
-            Statement sql = Conexion.getConexion().createStatement();
+            connection = Conexion.getConexion();
+            statement = connection.createStatement();
             String query = SQL_SELECT;
-            ResultSet rs = sql.executeQuery(query);
+            ResultSet rs = statement.executeQuery(query);
 
             while (rs.next()) {
                 clientes.add(new Cliente(
@@ -36,28 +42,30 @@ public class ClienteJDBC implements ClienteDAO{
                 rs.getString("razon_social")));
             }
             rs.close();
-            sql.close();
+            statement.close();
+            connection.close();
             System.out.println("Clientes-obtenidos");
         } catch (SQLException ex) {
             System.out.println("Error-selectClientes" + ex.toString());
         }
-
         return clientes;
     }
 
     @Override
     public void insert(Cliente cliente){
         try {
-            PreparedStatement stmt = Conexion.getConexion().prepareStatement(SQL_INSERT);
-            stmt.setString(1, cliente.getTipoPersona());
-            stmt.setString(2, cliente.getNombre());
-            stmt.setString(3, cliente.getApellido());
-            stmt.setString(4, cliente.getDni());
-            stmt.setString(5, cliente.getRuc());
-            stmt.setString(6, cliente.getRazonSocial());
+            connection = Conexion.getConexion();        
+            preparedStatement= connection.prepareStatement(SQL_INSERT);
+            preparedStatement.setString(1, cliente.getTipoPersona());
+            preparedStatement.setString(2, cliente.getNombre());
+            preparedStatement.setString(3, cliente.getApellido());
+            preparedStatement.setString(4, cliente.getDni());
+            preparedStatement.setString(5, cliente.getRuc());
+            preparedStatement.setString(6, cliente.getRazonSocial());
 
-            stmt.executeUpdate();
-            stmt.close();
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
             System.out.println("Cliente-agregado");
             
         } catch (SQLException ex) {
@@ -67,21 +75,21 @@ public class ClienteJDBC implements ClienteDAO{
 
     @Override
     public void update(Cliente cliente){
-        PreparedStatement stmt = null;
         try {
-            stmt = Conexion.getConexion().prepareStatement(SQL_UPDATE);
-            stmt.setString(1, cliente.getTipoPersona());
-            stmt.setString(2, cliente.getNombre());
-            stmt.setString(3, cliente.getApellido());
-            stmt.setString(4, cliente.getDni());
-            stmt.setString(5, cliente.getRuc());
-            stmt.setString(6, cliente.getRazonSocial());
-            stmt.setInt(7, cliente.getIdCliente());
+            connection = Conexion.getConexion();
+            preparedStatement = connection.prepareStatement(SQL_UPDATE);
+            preparedStatement.setString(1, cliente.getTipoPersona());
+            preparedStatement.setString(2, cliente.getNombre());
+            preparedStatement.setString(3, cliente.getApellido());
+            preparedStatement.setString(4, cliente.getDni());
+            preparedStatement.setString(5, cliente.getRuc());
+            preparedStatement.setString(6, cliente.getRazonSocial());
+            preparedStatement.setInt(7, cliente.getIdCliente());
 
-            stmt.executeUpdate();
+            preparedStatement.executeUpdate();
             System.out.println("Cliente-actualizado");
-            stmt.close();
-
+            preparedStatement.close();
+            connection.close();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         } 
@@ -90,11 +98,14 @@ public class ClienteJDBC implements ClienteDAO{
     @Override
     public void delete(Cliente cliente){
         try {
-            PreparedStatement stmt = Conexion.getConexion().prepareStatement(SQL_DELETE);
-            stmt.setInt(1, cliente.getIdCliente());
-            stmt.executeUpdate();
+            connection = Conexion.getConexion();
+            preparedStatement = connection.prepareStatement(SQL_DELETE);
+            preparedStatement.setInt(1, cliente.getIdCliente());
+            
+            preparedStatement.executeUpdate();
             System.out.println("Cliente-eliminado");
-            stmt.close();
+            preparedStatement.close();
+            connection.close();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         } 
