@@ -1921,12 +1921,16 @@ public class Plataforma extends javax.swing.JFrame {
         ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
         
         ventas.forEach(venta -> System.out.println(venta + "\n"));
+        
+        actualizarTablaVenta();
+        
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
         
         ventas.forEach(venta -> System.out.println(venta + "\n"));
+        actualizarTablaVenta();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void btnVactualizarReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVactualizarReporteActionPerformed
@@ -1938,12 +1942,14 @@ public class Plataforma extends javax.swing.JFrame {
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
         
         ventas.forEach(venta -> System.out.println(venta + "\n"));
+        actualizarTablaVenta();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
         
         ventas.forEach(venta -> System.out.println(venta + "\n"));
+        actualizarTablaVenta();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void sec01MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseClicked

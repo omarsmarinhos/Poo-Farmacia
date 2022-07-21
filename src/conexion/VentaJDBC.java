@@ -102,7 +102,7 @@ public class VentaJDBC implements VentaDAO {
             Statement sqlVenta = Conexion.getConexion().createStatement();
             String queryVenta = 
                     "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL "+ dias + " DAY)"
-                    + " AND CURRENT_DATE();";
+                    + " AND DATE_ADD(CURRENT_DATE(),INTERVAL 1 DAY)";
             ResultSet rsVenta = sqlVenta.executeQuery(queryVenta);
 
             while (rsVenta.next()) {
@@ -144,8 +144,8 @@ public class VentaJDBC implements VentaDAO {
         try {
             Statement sqlVenta = Conexion.getConexion().createStatement();
             String queryVenta = 
-                    "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 1 MONTH) "
-                    + "AND CURRENT_DATE()";
+                    "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 1 MONTH)"
+                    + " AND DATE_ADD(CURRENT_DATE(),INTERVAL 1 DAY)";
             ResultSet rsVenta = sqlVenta.executeQuery(queryVenta);
 
             while (rsVenta.next()) {
