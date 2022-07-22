@@ -1,28 +1,16 @@
 package ventanas;
 
-import clases.Cliente;
-import clases.DetalleVenta;
-import clases.Empleado;
-import clases.Producto;
-import clases.Venta;
-import conexion.ClienteJDBC;
-import conexion.Conexion;
-import conexion.EmpleadoJDBC;
-import conexion.ProductoJDBC;
-import conexion.VentaJDBC;
+import clases.*;
+import conexion.*;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.font.TextAttribute;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.awt.HeadlessException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
@@ -43,23 +31,29 @@ public class Plataforma extends javax.swing.JFrame {
     ArrayList<Cliente> clientes = new ArrayList<>();
     ArrayList<Empleado> empleados = new ArrayList<>();
     ArrayList<Venta> ventas = new ArrayList<>();
-    ArrayList<DetalleVenta> detalles = new ArrayList<>();
+    ArrayList<DetalleVenta> detalles = new ArrayList<>(); //detalles es el carrito
 
+    //variables auxiliares para actualizar registros
     int idProducto;
     int idEmpleado;
     int idCliente;
     int idDetalle;
-    Map atributeas;
-    Color colorEntrar = new Color(34,117,26);
-    Color colorSalir = new Color(45,156,35);
+
+    //id usuario activo
+    int idEmpleadoActual;
+
+    Color colorEntrar = new Color(34, 117, 26);
+    Color colorSalir = new Color(45, 156, 35);
 
     public Plataforma(int id_empleado) {
-        initComponents();
-
-        iniciarTablas();
+        //Trea las tablas de la base de datos
         empleados = empleadoJDBC.select();
         clientes = clienteJDBC.select();
         productos = productoJDBC.select();
+
+        initComponents();
+
+        iniciarTablas();
 
         btnPactualizar.setEnabled(false);
         btnPeliminar.setEnabled(false);
@@ -72,27 +66,38 @@ public class Plataforma extends javax.swing.JFrame {
 
         actualizarEmpleadoActual(id_empleado);
 
-        //Hacer esto a todas las tablas
-        tblCventas.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
-        tblCventas.getTableHeader().setForeground(Color.BLACK);
-        tblCventas.setRowHeight(25);
-        
-        tblCventasReporte.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
-        tblCventasReporte.getTableHeader().setForeground(Color.BLACK);
-        tblCventasReporte.setRowHeight(25);
-        
-        tblProductos.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
-        tblProductos.getTableHeader().setForeground(Color.BLACK);
-        tblProductos.setRowHeight(25);
-
-        //
-        atributeas = sec01.getFont().getAttributes();
-        atributeas.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-
+        formatoCabeceraTabla(tblProductos);
+        formatoCabeceraTabla(tblEmpleados);
+        formatoCabeceraTabla(tblClientes);
+        formatoCabeceraTabla(tblDetalles);
+        formatoCabeceraTabla(tblVentas);
+        formatoCabeceraTabla(tblClientesDialog);
+        formatoCabeceraTabla(tblProductosDialog);
+        formatoCabeceraTabla(tblDetallesDialog);
+        formatoCabeceraTabla(tblVentasReporte);
     }
 
+    //Carga los datos del usuario activo
     private void actualizarEmpleadoActual(int id_empleado) {
-        txtUsuarioActivo.setText("" + empleadoJDBC.getEmpleadoActual(id_empleado));
+        idEmpleadoActual = id_empleado;
+
+        int posEmpleado = 0;
+        for (int i = 0; i < empleados.size(); i++) {
+            if (empleados.get(i).getidEmpleado() == id_empleado) {
+                posEmpleado = i;
+                break;
+            }
+        }
+
+        txtUsuarioActivo.setText(empleados.get(posEmpleado).getNombre()
+                + " " + empleados.get(posEmpleado).getApellido());
+        txtRolActivo.setText(empleados.get(posEmpleado).getTipoEmpleado());
+    }
+
+    private void formatoCabeceraTabla(JTable tabla) {
+        tabla.getTableHeader().setFont(new Font("Segue UI", Font.BOLD, 14));
+        tabla.getTableHeader().setForeground(Color.BLACK);
+        tabla.setRowHeight(25);
     }
 
     private void iniciarTablas() {
@@ -110,18 +115,24 @@ public class Plataforma extends javax.swing.JFrame {
         tblEmpleados.setModel(modeloEmpleados);
         tblClientes.setModel(modeloClientes);
         tblDetalles.setModel(modeloDetalles);
-        tblCventas.setModel(modeloVentas);
+        tblVentas.setModel(modeloVentas);
         tblClientesDialog.setModel(modeloClientes);
         tblProductosDialog.setModel(modeloProdcutos);
         tblDetallesDialog.setModel(modeloDetalles);
-        tblCventasReporte.setModel(modeloVentas);
+        tblVentasReporte.setModel(modeloVentas);
     }
 
-    private void actualizarTablaProducto() {
-        int nRow = modeloProdcutos.getRowCount();
+    //Elimina todas la filas del DefaultTableModel enviada por parámetro
+    private void eliminarTodasLasFilas(DefaultTableModel modelo) {
+        int nRow = modelo.getRowCount();
         for (int i = nRow - 1; i >= 0; i--) {
-            modeloProdcutos.removeRow(i);
+            modelo.removeRow(i);
         }
+    }
+
+    //Agrega fila por fila los datos del Arraylist productos
+    private void actualizarTablaProducto() {
+        eliminarTodasLasFilas(modeloProdcutos);
 
         productos.forEach(producto -> {
             modeloProdcutos.addRow(new Object[]{
@@ -137,10 +148,7 @@ public class Plataforma extends javax.swing.JFrame {
     }
 
     private void actualizarTablaEmpleado() {
-        int nRow = modeloEmpleados.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloEmpleados.removeRow(i);
-        }
+        eliminarTodasLasFilas(modeloEmpleados);
 
         empleados.forEach(empleado -> {
             modeloEmpleados.addRow(new Object[]{
@@ -156,10 +164,7 @@ public class Plataforma extends javax.swing.JFrame {
     }
 
     private void actualizarTablaCliente() {
-        int nRow = modeloClientes.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloClientes.removeRow(i);
-        }
+        eliminarTodasLasFilas(modeloClientes);
 
         clientes.forEach(cliente -> {
             modeloClientes.addRow(new Object[]{
@@ -169,15 +174,13 @@ public class Plataforma extends javax.swing.JFrame {
                 cliente.getApellido(),
                 cliente.getDni(),
                 cliente.getRuc(),
-                cliente.getRazonSocial(),});
+                cliente.getRazonSocial()
+            });
         });
     }
 
     private void actualizarTablaVenta() {
-        int nRow = modeloVentas.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloVentas.removeRow(i);
-        }
+        eliminarTodasLasFilas(modeloVentas);
 
         ventas.forEach(venta -> {
             modeloVentas.addRow(new Object[]{
@@ -185,15 +188,12 @@ public class Plataforma extends javax.swing.JFrame {
                 venta.getCliente().getIdCliente(),
                 venta.getMetodoPago(),
                 venta.getImporteTotal(),
-                venta.getFecha(),});
+                venta.getFecha()});
         });
     }
 
     private void actualizarTablaDetalle(int x) {
-        int nRow = modeloDetalles.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloDetalles.removeRow(i);
-        }
+        eliminarTodasLasFilas(modeloDetalles);
 
         for (int i = 0; i < ventas.get(x).getDetalles().size(); i++) {
             modeloDetalles.addRow(new Object[]{
@@ -205,17 +205,17 @@ public class Plataforma extends javax.swing.JFrame {
     }
 
     private void actualizarTablaDetalle() {
-        int nRow = modeloDetalles.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloDetalles.removeRow(i);
-        }
+        eliminarTodasLasFilas(modeloDetalles);
+
         float suma = 0;
+
         for (int i = 0; i < detalles.size(); i++) {
             modeloDetalles.addRow(new Object[]{
                 detalles.get(i).getProducto().getNombreProducto(),
                 detalles.get(i).getProducto().getPrecioVenta(),
                 detalles.get(i).getCantidad(),
-                detalles.get(i).getImporte(),});
+                detalles.get(i).getImporte()
+            });
             suma += detalles.get(i).getImporte();
         }
 
@@ -237,13 +237,13 @@ public class Plataforma extends javax.swing.JFrame {
         jScrollPane9 = new javax.swing.JScrollPane();
         tblDetallesDialog = new javax.swing.JTable();
         btnSalir = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
+        panelInfoUsuario = new javax.swing.JPanel();
         foto = new javax.swing.JLabel();
         txtRolActivo = new javax.swing.JLabel();
         txtUsuarioActivo = new javax.swing.JLabel();
         cabecera = new javax.swing.JLabel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
+        paneles = new javax.swing.JTabbedPane();
+        panelProductos = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
@@ -271,7 +271,11 @@ public class Plataforma extends javax.swing.JFrame {
         btnPmostrar = new javax.swing.JButton();
         btnPactualizar = new javax.swing.JButton();
         btnPeliminar = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
+        panelCarrito = new javax.swing.JPanel();
+        jSeparator7 = new javax.swing.JSeparator();
+        jSeparator8 = new javax.swing.JSeparator();
+        jSeparator9 = new javax.swing.JSeparator();
+        jSeparator10 = new javax.swing.JSeparator();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
@@ -289,23 +293,29 @@ public class Plataforma extends javax.swing.JFrame {
         btnSelecCliente = new javax.swing.JButton();
         txtVproducto = new javax.swing.JTextField();
         btnSelectProducto = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
+        panelVentas = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tblCventas = new javax.swing.JTable();
+        tblVentas = new javax.swing.JTable();
         btnVactualizar = new javax.swing.JButton();
-        jPanel13 = new javax.swing.JPanel();
+        panelReportes = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
-        tblCventasReporte = new javax.swing.JTable();
+        tblVentasReporte = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         btnVactualizarReporte = new javax.swing.JButton();
-        jPanel14 = new javax.swing.JPanel();
+        btnVactualizarReporte1 = new javax.swing.JButton();
+        panelEmpleados = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
+        jSeparator11 = new javax.swing.JSeparator();
+        jSeparator12 = new javax.swing.JSeparator();
+        jSeparator13 = new javax.swing.JSeparator();
+        jSeparator14 = new javax.swing.JSeparator();
+        jSeparator15 = new javax.swing.JSeparator();
         txtEnombres = new javax.swing.JTextField();
         txtEapellidos = new javax.swing.JTextField();
         txtEdni = new javax.swing.JTextField();
@@ -320,9 +330,14 @@ public class Plataforma extends javax.swing.JFrame {
         txtEsueldo = new javax.swing.JTextField();
         jLabel30 = new javax.swing.JLabel();
         txtEcargo = new javax.swing.JTextField();
-        jPanel15 = new javax.swing.JPanel();
+        panelClientes = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tblClientes = new javax.swing.JTable();
+        jSeparator16 = new javax.swing.JSeparator();
+        jSeparator17 = new javax.swing.JSeparator();
+        jSeparator18 = new javax.swing.JSeparator();
+        jSeparator19 = new javax.swing.JSeparator();
+        jSeparator20 = new javax.swing.JSeparator();
         jLabel33 = new javax.swing.JLabel();
         jLabel34 = new javax.swing.JLabel();
         jLabel35 = new javax.swing.JLabel();
@@ -340,8 +355,8 @@ public class Plataforma extends javax.swing.JFrame {
         btnCactualizar = new javax.swing.JButton();
         btnCeliminar = new javax.swing.JButton();
         btnCmostrar = new javax.swing.JButton();
-        jPanel16 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
+        panelUsuarios = new javax.swing.JPanel();
+        panelNav = new javax.swing.JPanel();
         sec01 = new javax.swing.JLabel();
         sec02 = new javax.swing.JLabel();
         sec03 = new javax.swing.JLabel();
@@ -355,8 +370,12 @@ public class Plataforma extends javax.swing.JFrame {
         jDialogClientes.setLocationByPlatform(true);
         jDialogClientes.setModal(true);
         jDialogClientes.setResizable(false);
-        jDialogClientes.setSize(new java.awt.Dimension(600, 300));
+        jDialogClientes.setSize(new java.awt.Dimension(700, 350));
 
+        jScrollPane6.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(32, 131, 42), 1, true));
+
+        tblClientesDialog.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblClientesDialog.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblClientesDialog.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -368,6 +387,13 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblClientesDialog.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblClientesDialog.setFocusable(false);
+        tblClientesDialog.setGridColor(new java.awt.Color(51, 51, 51));
+        tblClientesDialog.setRowHeight(25);
+        tblClientesDialog.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblClientesDialog.getTableHeader().setResizingAllowed(false);
+        tblClientesDialog.getTableHeader().setReorderingAllowed(false);
         tblClientesDialog.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblClientesDialogMouseClicked(evt);
@@ -381,22 +407,24 @@ public class Plataforma extends javax.swing.JFrame {
             jDialogClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialogClientesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jDialogClientesLayout.setVerticalGroup(
             jDialogClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialogClientesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jDialogproducto.setTitle("Seleccionar un producto");
         jDialogproducto.setLocationByPlatform(true);
         jDialogproducto.setModal(true);
-        jDialogproducto.setSize(new java.awt.Dimension(600, 300));
+        jDialogproducto.setResizable(false);
+        jDialogproducto.setSize(new java.awt.Dimension(700, 350));
 
+        tblProductosDialog.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblProductosDialog.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -408,6 +436,13 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblProductosDialog.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblProductosDialog.setFocusable(false);
+        tblProductosDialog.setGridColor(new java.awt.Color(51, 51, 51));
+        tblProductosDialog.setRowHeight(25);
+        tblProductosDialog.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblProductosDialog.getTableHeader().setResizingAllowed(false);
+        tblProductosDialog.getTableHeader().setReorderingAllowed(false);
         tblProductosDialog.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblProductosDialogMouseClicked(evt);
@@ -421,14 +456,14 @@ public class Plataforma extends javax.swing.JFrame {
             jDialogproductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialogproductoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jDialogproductoLayout.setVerticalGroup(
             jDialogproductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialogproductoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -436,8 +471,12 @@ public class Plataforma extends javax.swing.JFrame {
         jDialogDetalles.setLocationByPlatform(true);
         jDialogDetalles.setModal(true);
         jDialogDetalles.setResizable(false);
-        jDialogDetalles.setSize(new java.awt.Dimension(600, 300));
+        jDialogDetalles.setSize(new java.awt.Dimension(700, 350));
 
+        jScrollPane9.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(32, 131, 42), 1, true));
+
+        tblDetallesDialog.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblDetallesDialog.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblDetallesDialog.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -449,17 +488,30 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblDetallesDialog.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblDetallesDialog.setFocusable(false);
+        tblDetallesDialog.setGridColor(new java.awt.Color(51, 51, 51));
+        tblDetallesDialog.setRowHeight(25);
+        tblDetallesDialog.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblDetallesDialog.getTableHeader().setResizingAllowed(false);
+        tblDetallesDialog.getTableHeader().setReorderingAllowed(false);
         jScrollPane9.setViewportView(tblDetallesDialog);
 
         javax.swing.GroupLayout jDialogDetallesLayout = new javax.swing.GroupLayout(jDialogDetalles.getContentPane());
         jDialogDetalles.getContentPane().setLayout(jDialogDetallesLayout);
         jDialogDetallesLayout.setHorizontalGroup(
             jDialogDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogDetallesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jDialogDetallesLayout.setVerticalGroup(
             jDialogDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogDetallesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -486,26 +538,26 @@ public class Plataforma extends javax.swing.JFrame {
         });
         getContentPane().add(btnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 0, 40, 40));
 
-        jPanel7.setBackground(new java.awt.Color(45, 156, 35));
-        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelInfoUsuario.setBackground(new java.awt.Color(45, 156, 35));
+        panelInfoUsuario.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         foto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         foto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/usuario.png"))); // NOI18N
-        jPanel7.add(foto, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 190, 100));
+        panelInfoUsuario.add(foto, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 190, 100));
 
         txtRolActivo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         txtRolActivo.setForeground(new java.awt.Color(255, 255, 255));
         txtRolActivo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         txtRolActivo.setText("ADMINISTRADOR");
-        jPanel7.add(txtRolActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 190, 20));
+        panelInfoUsuario.add(txtRolActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 190, 20));
 
         txtUsuarioActivo.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         txtUsuarioActivo.setForeground(new java.awt.Color(255, 255, 255));
         txtUsuarioActivo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         txtUsuarioActivo.setText("EDDY OLIVO AYALA");
-        jPanel7.add(txtUsuarioActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 190, 20));
+        panelInfoUsuario.add(txtUsuarioActivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 180, 190, 20));
 
-        getContentPane().add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 220));
+        getContentPane().add(panelInfoUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 220));
 
         cabecera.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.png"))); // NOI18N
         cabecera.setCursor(new java.awt.Cursor(java.awt.Cursor.MOVE_CURSOR));
@@ -521,57 +573,58 @@ public class Plataforma extends javax.swing.JFrame {
         });
         getContentPane().add(cabecera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1100, 80));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setPreferredSize(new java.awt.Dimension(716, 755));
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelProductos.setBackground(new java.awt.Color(255, 255, 255));
+        panelProductos.setPreferredSize(new java.awt.Dimension(716, 755));
+        panelProductos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel2.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 290, 260, 10));
+        panelProductos.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 290, 260, 10));
 
         jSeparator2.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel2.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 200, 10));
+        panelProductos.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 200, 10));
 
         jSeparator3.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel2.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 200, 10));
+        panelProductos.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 200, 10));
 
         jSeparator4.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel2.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 80, 210, 10));
+        panelProductos.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 80, 210, 10));
 
         jSeparator5.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel2.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 120, 210, 10));
+        panelProductos.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 120, 210, 10));
 
         jSeparator6.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel2.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 160, 210, 10));
+        panelProductos.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 160, 210, 10));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("Presentación:");
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, -1, -1));
+        panelProductos.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, -1, -1));
 
+        cmbPpresentacion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cmbPpresentacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Comprimido", "Pildora" }));
-        jPanel2.add(cmbPpresentacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 100, 200, 30));
+        panelProductos.add(cmbPpresentacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 100, 200, 30));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("Precio:");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 140, -1, -1));
+        panelProductos.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 140, -1, -1));
 
         txtPconcentracion.setBorder(null);
-        jPanel2.add(txtPconcentracion, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 100, 210, 25));
+        panelProductos.add(txtPconcentracion, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 100, 210, 25));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setText("Stock:");
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, -1));
+        panelProductos.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setText("Fecha vencimiento:");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 60, -1, -1));
+        panelProductos.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 60, -1, -1));
 
         txtPfechaVenc.setBorder(null);
-        jPanel2.add(txtPfechaVenc, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 60, 210, 25));
+        panelProductos.add(txtPfechaVenc, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 60, 210, 25));
 
         txtPnombre.setBorder(null);
-        jPanel2.add(txtPnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 60, 200, 25));
+        panelProductos.add(txtPnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 60, 200, 25));
 
-        btnPregistrar.setBackground(new java.awt.Color(62, 131, 42));
+        btnPregistrar.setBackground(new java.awt.Color(34, 73, 24));
         btnPregistrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnPregistrar.setForeground(new java.awt.Color(255, 255, 255));
         btnPregistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-plus-lined-32.png"))); // NOI18N
@@ -585,10 +638,10 @@ public class Plataforma extends javax.swing.JFrame {
                 btnPregistrarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnPregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 190, 140, 40));
+        panelProductos.add(btnPregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 190, 140, 40));
 
         txtPbuscar.setBorder(null);
-        jPanel2.add(txtPbuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 270, 260, 25));
+        panelProductos.add(txtPbuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 270, 260, 25));
 
         jScrollPane1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
 
@@ -619,9 +672,9 @@ public class Plataforma extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tblProductos);
 
-        jPanel2.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 820, 270));
+        panelProductos.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 820, 270));
 
-        jButton2.setBackground(new java.awt.Color(62, 131, 42));
+        jButton2.setBackground(new java.awt.Color(34, 73, 24));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
@@ -634,15 +687,15 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 260, 70, 40));
+        panelProductos.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 260, 70, 40));
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel7.setText("Buscar nombre de producto:");
-        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, -1, -1));
+        panelProductos.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, -1, -1));
 
         jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel18.setText("Nombre:");
-        jPanel2.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, -1, -1));
+        panelProductos.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, -1, -1));
 
         txtPstock.setBorder(null);
         txtPstock.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -650,11 +703,11 @@ public class Plataforma extends javax.swing.JFrame {
                 txtPstockKeyTyped(evt);
             }
         });
-        jPanel2.add(txtPstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 200, 25));
+        panelProductos.add(txtPstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 200, 25));
 
         jLabel27.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel27.setText("Concetración:");
-        jPanel2.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 100, -1, -1));
+        panelProductos.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 100, -1, -1));
 
         txtPprecio.setBorder(null);
         txtPprecio.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -662,9 +715,9 @@ public class Plataforma extends javax.swing.JFrame {
                 txtPprecioKeyTyped(evt);
             }
         });
-        jPanel2.add(txtPprecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 140, 210, 25));
+        panelProductos.add(txtPprecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 140, 210, 25));
 
-        btnPmostrar.setBackground(new java.awt.Color(62, 131, 42));
+        btnPmostrar.setBackground(new java.awt.Color(34, 73, 24));
         btnPmostrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnPmostrar.setForeground(new java.awt.Color(255, 255, 255));
         btnPmostrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-list-lined-32.png"))); // NOI18N
@@ -678,9 +731,9 @@ public class Plataforma extends javax.swing.JFrame {
                 btnPmostrarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnPmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 190, 140, 40));
+        panelProductos.add(btnPmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 190, 140, 40));
 
-        btnPactualizar.setBackground(new java.awt.Color(62, 131, 42));
+        btnPactualizar.setBackground(new java.awt.Color(34, 73, 24));
         btnPactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnPactualizar.setForeground(new java.awt.Color(255, 255, 255));
         btnPactualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-reload-thin-32.png"))); // NOI18N
@@ -694,9 +747,9 @@ public class Plataforma extends javax.swing.JFrame {
                 btnPactualizarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnPactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 190, 140, 40));
+        panelProductos.add(btnPactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 190, 140, 40));
 
-        btnPeliminar.setBackground(new java.awt.Color(62, 131, 42));
+        btnPeliminar.setBackground(new java.awt.Color(34, 73, 24));
         btnPeliminar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnPeliminar.setForeground(new java.awt.Color(255, 255, 255));
         btnPeliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-minus-lined-32.png"))); // NOI18N
@@ -710,23 +763,44 @@ public class Plataforma extends javax.swing.JFrame {
                 btnPeliminarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnPeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 190, 140, 40));
+        panelProductos.add(btnPeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 190, 140, 40));
 
-        jTabbedPane1.addTab("Productos", jPanel2);
+        paneles.addTab("Productos", panelProductos);
 
-        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel9.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelCarrito.setBackground(new java.awt.Color(255, 255, 255));
+        panelCarrito.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jSeparator7.setForeground(new java.awt.Color(0, 0, 0));
+        panelCarrito.add(jSeparator7, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 580, 200, 10));
+
+        jSeparator8.setForeground(new java.awt.Color(0, 0, 0));
+        panelCarrito.add(jSeparator8, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 90, 200, 10));
+
+        jSeparator9.setForeground(new java.awt.Color(0, 0, 0));
+        panelCarrito.add(jSeparator9, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 90, 200, 10));
+
+        jSeparator10.setForeground(new java.awt.Color(0, 0, 0));
+        panelCarrito.add(jSeparator10, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 140, 200, 10));
+
+        jLabel19.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel19.setText("Producto:");
-        jPanel9.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 40, 74, -1));
+        panelCarrito.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 70, 74, -1));
 
+        jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel20.setText("Cantidad:");
-        jPanel9.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 71, -1, -1));
+        panelCarrito.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 120, -1, -1));
 
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel22.setText("Metodo de pago:");
-        jPanel9.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 105, -1, -1));
-        jPanel9.add(txtVcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(114, 68, 110, -1));
+        panelCarrito.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, -1, -1));
 
+        txtVcantidad.setBorder(null);
+        panelCarrito.add(txtVcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 120, 200, 25));
+
+        jScrollPane2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
+
+        tblDetalles.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblDetalles.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblDetalles.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -738,6 +812,13 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblDetalles.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblDetalles.setFocusable(false);
+        tblDetalles.setGridColor(new java.awt.Color(51, 51, 51));
+        tblDetalles.setRowHeight(25);
+        tblDetalles.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblDetalles.getTableHeader().setResizingAllowed(false);
+        tblDetalles.getTableHeader().setReorderingAllowed(false);
         tblDetalles.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblDetallesMouseClicked(evt);
@@ -745,76 +826,123 @@ public class Plataforma extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(tblDetalles);
 
-        jPanel9.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(77, 189, 515, 231));
+        panelCarrito.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 810, 260));
 
+        cmbVmetodoPago.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cmbVmetodoPago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Efectivo", "Tarjeta" }));
-        jPanel9.add(cmbVmetodoPago, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 102, -1, -1));
+        cmbVmetodoPago.setBorder(null);
+        panelCarrito.add(cmbVmetodoPago, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 170, 200, 30));
 
+        btnAgregarCarrito.setBackground(new java.awt.Color(34, 73, 24));
+        btnAgregarCarrito.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnAgregarCarrito.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregarCarrito.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-plus-lined-32.png"))); // NOI18N
         btnAgregarCarrito.setText("Agregar");
+        btnAgregarCarrito.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnAgregarCarrito.setBorderPainted(false);
+        btnAgregarCarrito.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAgregarCarrito.setFocusPainted(false);
         btnAgregarCarrito.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAgregarCarritoActionPerformed(evt);
             }
         });
-        jPanel9.add(btnAgregarCarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(77, 155, 110, -1));
+        panelCarrito.add(btnAgregarCarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 140, 40));
 
-        btnEliminarElementoCarrito.setText("Eliminar");
+        btnEliminarElementoCarrito.setBackground(new java.awt.Color(34, 73, 24));
+        btnEliminarElementoCarrito.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnEliminarElementoCarrito.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminarElementoCarrito.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-minus-lined-32.png"))); // NOI18N
+        btnEliminarElementoCarrito.setText("Quitar");
+        btnEliminarElementoCarrito.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnEliminarElementoCarrito.setBorderPainted(false);
+        btnEliminarElementoCarrito.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminarElementoCarrito.setEnabled(false);
+        btnEliminarElementoCarrito.setFocusPainted(false);
         btnEliminarElementoCarrito.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEliminarElementoCarritoActionPerformed(evt);
             }
         });
-        jPanel9.add(btnEliminarElementoCarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(478, 155, 114, -1));
+        panelCarrito.add(btnEliminarElementoCarrito, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 220, 140, 40));
 
-        btnProcesarVenta.setText("PROCESAR VENTA");
+        btnProcesarVenta.setBackground(new java.awt.Color(62, 131, 42));
+        btnProcesarVenta.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnProcesarVenta.setForeground(new java.awt.Color(255, 255, 255));
+        btnProcesarVenta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-marketing-2-32.png"))); // NOI18N
+        btnProcesarVenta.setText("Procesar");
+        btnProcesarVenta.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnProcesarVenta.setBorderPainted(false);
+        btnProcesarVenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnProcesarVenta.setFocusPainted(false);
         btnProcesarVenta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnProcesarVentaActionPerformed(evt);
             }
         });
-        jPanel9.add(btnProcesarVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(77, 438, -1, -1));
+        panelCarrito.add(btnProcesarVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 550, 140, 40));
 
+        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel26.setText("Importe Total");
-        jPanel9.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(403, 441, -1, -1));
-        jPanel9.add(txtVmonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(492, 438, 100, -1));
+        panelCarrito.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 560, -1, -1));
 
+        txtVmonto.setEditable(false);
+        txtVmonto.setBorder(null);
+        panelCarrito.add(txtVmonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 560, 200, 25));
+
+        jLabel39.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel39.setText("Cliente");
-        jPanel9.add(jLabel39, new org.netbeans.lib.awtextra.AbsoluteConstraints(365, 40, -1, -1));
+        panelCarrito.add(jLabel39, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 70, -1, -1));
 
         txtVcliente.setEditable(false);
-        jPanel9.add(txtVcliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 37, 95, -1));
+        txtVcliente.setBorder(null);
+        panelCarrito.add(txtVcliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 70, 200, 25));
 
-        btnSelecCliente.setText("Seleccionar");
+        btnSelecCliente.setBackground(new java.awt.Color(34, 73, 24));
+        btnSelecCliente.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnSelecCliente.setForeground(new java.awt.Color(255, 255, 255));
+        btnSelecCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnSelecCliente.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnSelecCliente.setBorderPainted(false);
+        btnSelecCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSelecCliente.setFocusPainted(false);
         btnSelecCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSelecClienteActionPerformed(evt);
             }
         });
-        jPanel9.add(btnSelecCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(533, 37, -1, -1));
+        panelCarrito.add(btnSelecCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 70, 40));
 
         txtVproducto.setEditable(false);
-        jPanel9.add(txtVproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(115, 37, 107, -1));
+        txtVproducto.setBorder(null);
+        panelCarrito.add(txtVproducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, 200, 25));
 
-        btnSelectProducto.setText("Seleccionar");
+        btnSelectProducto.setBackground(new java.awt.Color(34, 73, 24));
+        btnSelectProducto.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnSelectProducto.setForeground(new java.awt.Color(255, 255, 255));
+        btnSelectProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnSelectProducto.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnSelectProducto.setBorderPainted(false);
+        btnSelectProducto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSelectProducto.setFocusPainted(false);
         btnSelectProducto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSelectProductoActionPerformed(evt);
             }
         });
-        jPanel9.add(btnSelectProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(234, 37, -1, -1));
+        panelCarrito.add(btnSelectProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 60, 70, 40));
 
-        jTabbedPane1.addTab("VENTAS", jPanel9);
+        paneles.addTab("VENTAS", panelCarrito);
 
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelVentas.setBackground(new java.awt.Color(255, 255, 255));
+        panelVentas.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jScrollPane3.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
 
-        tblCventas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        tblCventas.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tblCventas.setModel(new javax.swing.table.DefaultTableModel(
+        tblVentas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        tblVentas.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tblVentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -825,23 +953,23 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblCventas.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tblCventas.setFocusable(false);
-        tblCventas.setGridColor(new java.awt.Color(51, 51, 51));
-        tblCventas.setRowHeight(25);
-        tblCventas.setSelectionBackground(new java.awt.Color(62, 131, 42));
-        tblCventas.getTableHeader().setResizingAllowed(false);
-        tblCventas.getTableHeader().setReorderingAllowed(false);
-        tblCventas.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblVentas.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblVentas.setFocusable(false);
+        tblVentas.setGridColor(new java.awt.Color(51, 51, 51));
+        tblVentas.setRowHeight(25);
+        tblVentas.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblVentas.getTableHeader().setResizingAllowed(false);
+        tblVentas.getTableHeader().setReorderingAllowed(false);
+        tblVentas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblCventasMouseClicked(evt);
+                tblVentasMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(tblCventas);
+        jScrollPane3.setViewportView(tblVentas);
 
-        jPanel5.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 820, 370));
+        panelVentas.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 820, 370));
 
-        btnVactualizar.setBackground(new java.awt.Color(62, 131, 42));
+        btnVactualizar.setBackground(new java.awt.Color(34, 73, 24));
         btnVactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnVactualizar.setForeground(new java.awt.Color(255, 255, 255));
         btnVactualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
@@ -856,19 +984,19 @@ public class Plataforma extends javax.swing.JFrame {
                 btnVactualizarActionPerformed(evt);
             }
         });
-        jPanel5.add(btnVactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 440, 180, 40));
+        panelVentas.add(btnVactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 440, 180, 40));
 
-        jTabbedPane1.addTab("COMPRABANTES", jPanel5);
+        paneles.addTab("COMPRABANTES", panelVentas);
 
-        jPanel13.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelReportes.setBackground(new java.awt.Color(255, 255, 255));
+        panelReportes.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jScrollPane8.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane8.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
 
-        tblCventasReporte.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        tblCventasReporte.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        tblCventasReporte.setModel(new javax.swing.table.DefaultTableModel(
+        tblVentasReporte.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        tblVentasReporte.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tblVentasReporte.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -879,21 +1007,21 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblCventasReporte.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tblCventasReporte.setFocusable(false);
-        tblCventasReporte.setGridColor(new java.awt.Color(51, 51, 51));
-        tblCventasReporte.setRowHeight(25);
-        tblCventasReporte.setSelectionBackground(new java.awt.Color(62, 131, 42));
-        tblCventasReporte.getTableHeader().setResizingAllowed(false);
-        tblCventasReporte.getTableHeader().setReorderingAllowed(false);
-        tblCventasReporte.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblVentasReporte.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblVentasReporte.setFocusable(false);
+        tblVentasReporte.setGridColor(new java.awt.Color(51, 51, 51));
+        tblVentasReporte.setRowHeight(25);
+        tblVentasReporte.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblVentasReporte.getTableHeader().setResizingAllowed(false);
+        tblVentasReporte.getTableHeader().setReorderingAllowed(false);
+        tblVentasReporte.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblCventasReporteMouseClicked(evt);
+                tblVentasReporteMouseClicked(evt);
             }
         });
-        jScrollPane8.setViewportView(tblCventasReporte);
+        jScrollPane8.setViewportView(tblVentasReporte);
 
-        jPanel13.add(jScrollPane8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 820, 370));
+        panelReportes.add(jScrollPane8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 820, 370));
 
         jButton1.setText("Generar reporte de Quincena");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -901,7 +1029,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel13.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 470, -1, -1));
+        panelReportes.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 470, -1, -1));
 
         jButton3.setText("Generar reporte de Dia");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -909,7 +1037,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
-        jPanel13.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, -1));
+        panelReportes.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, -1));
 
         jButton4.setText("Generar reporte de Semana");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -917,7 +1045,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
-        jPanel13.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 470, -1, -1));
+        panelReportes.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 470, -1, -1));
 
         jButton5.setText("Generar reporte de Mes");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -925,9 +1053,9 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton5ActionPerformed(evt);
             }
         });
-        jPanel13.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 470, -1, -1));
+        panelReportes.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 470, -1, -1));
 
-        btnVactualizarReporte.setBackground(new java.awt.Color(62, 131, 42));
+        btnVactualizarReporte.setBackground(new java.awt.Color(34, 73, 24));
         btnVactualizarReporte.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnVactualizarReporte.setForeground(new java.awt.Color(255, 255, 255));
         btnVactualizarReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
@@ -942,50 +1070,93 @@ public class Plataforma extends javax.swing.JFrame {
                 btnVactualizarReporteActionPerformed(evt);
             }
         });
-        jPanel13.add(btnVactualizarReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 510, 180, 40));
+        panelReportes.add(btnVactualizarReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, 180, 40));
 
-        jTabbedPane1.addTab("REPORTES", jPanel13);
+        btnVactualizarReporte1.setBackground(new java.awt.Color(34, 73, 24));
+        btnVactualizarReporte1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnVactualizarReporte1.setForeground(new java.awt.Color(255, 255, 255));
+        btnVactualizarReporte1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
+        btnVactualizarReporte1.setText("Generar reporte");
+        btnVactualizarReporte1.setToolTipText("");
+        btnVactualizarReporte1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnVactualizarReporte1.setBorderPainted(false);
+        btnVactualizarReporte1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVactualizarReporte1.setFocusPainted(false);
+        btnVactualizarReporte1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVactualizarReporte1ActionPerformed(evt);
+            }
+        });
+        panelReportes.add(btnVactualizarReporte1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 520, 180, 40));
 
-        jPanel14.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel14.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        paneles.addTab("REPORTES", panelReportes);
 
+        panelEmpleados.setBackground(new java.awt.Color(255, 255, 255));
+        panelEmpleados.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel10.setText("Nombres");
-        jPanel14.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 51, -1, -1));
+        panelEmpleados.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 70, -1, -1));
 
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel11.setText("Apellidos");
-        jPanel14.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 91, -1, -1));
+        panelEmpleados.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 110, -1, -1));
 
+        jLabel21.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel21.setText("DNI");
-        jPanel14.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 131, -1, -1));
+        panelEmpleados.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, -1, -1));
 
+        jLabel28.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel28.setText("Tipo de empleado");
-        jPanel14.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 51, -1, -1));
+        panelEmpleados.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 70, -1, -1));
 
+        jSeparator11.setForeground(new java.awt.Color(0, 0, 0));
+        panelEmpleados.add(jSeparator11, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 170, 200, 10));
+
+        jSeparator12.setForeground(new java.awt.Color(0, 0, 0));
+        panelEmpleados.add(jSeparator12, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 90, 200, 10));
+
+        jSeparator13.setForeground(new java.awt.Color(0, 0, 0));
+        panelEmpleados.add(jSeparator13, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 130, 200, 10));
+
+        jSeparator14.setForeground(new java.awt.Color(0, 0, 0));
+        panelEmpleados.add(jSeparator14, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 170, 200, 10));
+
+        jSeparator15.setForeground(new java.awt.Color(0, 0, 0));
+        panelEmpleados.add(jSeparator15, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 130, 200, 10));
+
+        txtEnombres.setBorder(null);
         txtEnombres.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtEnombresKeyTyped(evt);
             }
         });
-        jPanel14.add(txtEnombres, new org.netbeans.lib.awtextra.AbsoluteConstraints(103, 48, 150, -1));
+        panelEmpleados.add(txtEnombres, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 70, 200, 25));
 
+        txtEapellidos.setBorder(null);
         txtEapellidos.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtEapellidosKeyTyped(evt);
             }
         });
-        jPanel14.add(txtEapellidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(103, 88, 150, -1));
+        panelEmpleados.add(txtEapellidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 110, 200, 25));
 
+        txtEdni.setBorder(null);
         txtEdni.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtEdniKeyTyped(evt);
             }
         });
-        jPanel14.add(txtEdni, new org.netbeans.lib.awtextra.AbsoluteConstraints(103, 128, 150, -1));
+        panelEmpleados.add(txtEdni, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 150, 200, 25));
 
+        cmbEtipoEmpleado.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cmbEtipoEmpleado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrador", "Usuario" }));
-        jPanel14.add(cmbEtipoEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(432, 48, 150, -1));
+        panelEmpleados.add(cmbEtipoEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 70, 200, 30));
 
-        tblEmpleados.setAutoCreateRowSorter(true);
+        jScrollPane4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
+
+        tblEmpleados.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblEmpleados.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblEmpleados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -997,6 +1168,13 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblEmpleados.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblEmpleados.setFocusable(false);
+        tblEmpleados.setGridColor(new java.awt.Color(51, 51, 51));
+        tblEmpleados.setRowHeight(25);
+        tblEmpleados.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblEmpleados.getTableHeader().setResizingAllowed(false);
+        tblEmpleados.getTableHeader().setReorderingAllowed(false);
         tblEmpleados.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblEmpleadosMouseClicked(evt);
@@ -1004,59 +1182,100 @@ public class Plataforma extends javax.swing.JFrame {
         });
         jScrollPane4.setViewportView(tblEmpleados);
 
-        jPanel14.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 239, 592, 247));
+        panelEmpleados.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 327, 820, 260));
 
-        btnEregistrar.setText("Agregar");
+        btnEregistrar.setBackground(new java.awt.Color(34, 73, 24));
+        btnEregistrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnEregistrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEregistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-plus-lined-32.png"))); // NOI18N
+        btnEregistrar.setText("Registrar");
+        btnEregistrar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnEregistrar.setBorderPainted(false);
+        btnEregistrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEregistrar.setFocusPainted(false);
         btnEregistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEregistrarActionPerformed(evt);
             }
         });
-        jPanel14.add(btnEregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(54, 183, -1, -1));
+        panelEmpleados.add(btnEregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 260, 140, 40));
 
+        btnEactualizar.setBackground(new java.awt.Color(34, 73, 24));
+        btnEactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnEactualizar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEactualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-reload-thin-32.png"))); // NOI18N
         btnEactualizar.setText("Actualizar");
+        btnEactualizar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnEactualizar.setBorderPainted(false);
+        btnEactualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEactualizar.setFocusPainted(false);
         btnEactualizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEactualizarActionPerformed(evt);
             }
         });
-        jPanel14.add(btnEactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(171, 183, -1, -1));
+        panelEmpleados.add(btnEactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 260, 140, 40));
 
+        btnEeliminar.setBackground(new java.awt.Color(34, 73, 24));
+        btnEeliminar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnEeliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEeliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-minus-lined-32.png"))); // NOI18N
         btnEeliminar.setText("Eliminar");
+        btnEeliminar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnEeliminar.setBorderPainted(false);
+        btnEeliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEeliminar.setFocusPainted(false);
         btnEeliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEeliminarActionPerformed(evt);
             }
         });
-        jPanel14.add(btnEeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 183, -1, -1));
+        panelEmpleados.add(btnEeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 260, 140, 40));
 
+        btnEmostrar.setBackground(new java.awt.Color(34, 73, 24));
+        btnEmostrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnEmostrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEmostrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-list-lined-32.png"))); // NOI18N
         btnEmostrar.setText("Mostrar");
+        btnEmostrar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnEmostrar.setBorderPainted(false);
+        btnEmostrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEmostrar.setFocusPainted(false);
         btnEmostrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEmostrarActionPerformed(evt);
             }
         });
-        jPanel14.add(btnEmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 183, -1, -1));
+        panelEmpleados.add(btnEmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 260, 140, 40));
 
+        jLabel29.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel29.setText("Sueldo");
-        jPanel14.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 91, -1, -1));
+        panelEmpleados.add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 110, -1, -1));
 
+        txtEsueldo.setBorder(null);
         txtEsueldo.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtEsueldoKeyTyped(evt);
             }
         });
-        jPanel14.add(txtEsueldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(432, 88, 150, -1));
+        panelEmpleados.add(txtEsueldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, 200, 25));
 
+        jLabel30.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel30.setText("Cargo");
-        jPanel14.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 131, -1, -1));
-        jPanel14.add(txtEcargo, new org.netbeans.lib.awtextra.AbsoluteConstraints(432, 128, 150, -1));
+        panelEmpleados.add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 150, -1, -1));
 
-        jTabbedPane1.addTab("EMPLEADOS", jPanel14);
+        txtEcargo.setBorder(null);
+        panelEmpleados.add(txtEcargo, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 150, 200, 25));
 
-        jPanel15.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel15.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        paneles.addTab("EMPLEADOS", panelEmpleados);
 
+        panelClientes.setBackground(new java.awt.Color(255, 255, 255));
+        panelClientes.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jScrollPane5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
+
+        tblClientes.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblClientes.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1068,6 +1287,13 @@ public class Plataforma extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblClientes.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblClientes.setFocusable(false);
+        tblClientes.setGridColor(new java.awt.Color(51, 51, 51));
+        tblClientes.setRowHeight(25);
+        tblClientes.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblClientes.getTableHeader().setResizingAllowed(false);
+        tblClientes.getTableHeader().setReorderingAllowed(false);
         tblClientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblClientesMouseClicked(evt);
@@ -1075,115 +1301,184 @@ public class Plataforma extends javax.swing.JFrame {
         });
         jScrollPane5.setViewportView(tblClientes);
 
-        jPanel15.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 309, 698, 222));
+        panelClientes.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 830, 280));
 
+        jSeparator16.setForeground(new java.awt.Color(0, 0, 0));
+        panelClientes.add(jSeparator16, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 220, 200, 10));
+
+        jSeparator17.setForeground(new java.awt.Color(0, 0, 0));
+        panelClientes.add(jSeparator17, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 140, 200, 10));
+
+        jSeparator18.setForeground(new java.awt.Color(0, 0, 0));
+        panelClientes.add(jSeparator18, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 100, 200, 10));
+
+        jSeparator19.setForeground(new java.awt.Color(0, 0, 0));
+        panelClientes.add(jSeparator19, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 180, 200, 10));
+
+        jSeparator20.setForeground(new java.awt.Color(0, 0, 0));
+        panelClientes.add(jSeparator20, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 180, 200, 10));
+
+        jLabel33.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel33.setText("Nombres");
-        jPanel15.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(44, 30, -1, -1));
+        panelClientes.add(jLabel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, -1, -1));
 
+        jLabel34.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel34.setText("Apellidos");
-        jPanel15.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(44, 70, -1, -1));
+        panelClientes.add(jLabel34, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, -1));
 
+        jLabel35.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel35.setText("DNI");
-        jPanel15.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(44, 110, -1, -1));
+        panelClientes.add(jLabel35, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, -1, -1));
 
+        txtCnombres.setBorder(null);
+        txtCnombres.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCnombresFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtCnombresFocusLost(evt);
+            }
+        });
         txtCnombres.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCnombresKeyTyped(evt);
             }
         });
-        jPanel15.add(txtCnombres, new org.netbeans.lib.awtextra.AbsoluteConstraints(124, 27, 150, -1));
+        panelClientes.add(txtCnombres, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 80, 200, 25));
 
+        txtCapellidos.setBorder(null);
         txtCapellidos.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCapellidosKeyTyped(evt);
             }
         });
-        jPanel15.add(txtCapellidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(124, 67, 150, -1));
+        panelClientes.add(txtCapellidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 120, 200, 25));
 
+        txtCdni.setBorder(null);
         txtCdni.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCdniKeyTyped(evt);
             }
         });
-        jPanel15.add(txtCdni, new org.netbeans.lib.awtextra.AbsoluteConstraints(124, 107, 150, -1));
+        panelClientes.add(txtCdni, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 160, 200, 25));
 
         buttonGroup1.add(rbtCnatural);
+        rbtCnatural.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         rbtCnatural.setText("Natural");
         rbtCnatural.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbtCnaturalActionPerformed(evt);
             }
         });
-        jPanel15.add(rbtCnatural, new org.netbeans.lib.awtextra.AbsoluteConstraints(484, 29, -1, -1));
+        panelClientes.add(rbtCnatural, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 80, -1, -1));
 
         buttonGroup1.add(rbtCjuridico);
+        rbtCjuridico.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         rbtCjuridico.setText("Jurídica");
         rbtCjuridico.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbtCjuridicoActionPerformed(evt);
             }
         });
-        jPanel15.add(rbtCjuridico, new org.netbeans.lib.awtextra.AbsoluteConstraints(484, 61, -1, -1));
-        jPanel15.add(txtCrazon, new org.netbeans.lib.awtextra.AbsoluteConstraints(474, 147, 150, -1));
+        panelClientes.add(rbtCjuridico, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 110, -1, -1));
 
+        txtCrazon.setBorder(null);
+        panelClientes.add(txtCrazon, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 200, 200, 25));
+
+        jLabel36.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel36.setText("RUC");
-        jPanel15.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(377, 110, -1, -1));
+        panelClientes.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 160, -1, -1));
 
+        jLabel37.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel37.setText("Razon Social");
-        jPanel15.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(377, 150, -1, -1));
+        panelClientes.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 200, -1, -1));
 
+        txtCruc.setBorder(null);
         txtCruc.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCrucKeyTyped(evt);
             }
         });
-        jPanel15.add(txtCruc, new org.netbeans.lib.awtextra.AbsoluteConstraints(474, 107, 150, -1));
+        panelClientes.add(txtCruc, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 160, 200, 25));
 
+        jLabel38.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel38.setText("Tipo de Persona");
-        jPanel15.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(377, 31, -1, -1));
+        panelClientes.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, -1, -1));
 
-        btnCregistrar.setText("REGISTRAR");
+        btnCregistrar.setBackground(new java.awt.Color(62, 131, 42));
+        btnCregistrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnCregistrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCregistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-plus-lined-32.png"))); // NOI18N
+        btnCregistrar.setText("Registrar");
+        btnCregistrar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnCregistrar.setBorderPainted(false);
+        btnCregistrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCregistrar.setFocusPainted(false);
         btnCregistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCregistrarActionPerformed(evt);
             }
         });
-        jPanel15.add(btnCregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(33, 244, -1, -1));
+        panelClientes.add(btnCregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 250, 140, 40));
 
+        btnCactualizar.setBackground(new java.awt.Color(62, 131, 42));
+        btnCactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnCactualizar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCactualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-reload-thin-32.png"))); // NOI18N
         btnCactualizar.setText("Actualizar");
+        btnCactualizar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnCactualizar.setBorderPainted(false);
+        btnCactualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCactualizar.setFocusPainted(false);
         btnCactualizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCactualizarActionPerformed(evt);
             }
         });
-        jPanel15.add(btnCactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(192, 244, -1, -1));
+        panelClientes.add(btnCactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 250, 140, 40));
 
+        btnCeliminar.setBackground(new java.awt.Color(62, 131, 42));
+        btnCeliminar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnCeliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCeliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-minus-lined-32.png"))); // NOI18N
         btnCeliminar.setText("Eliminar");
+        btnCeliminar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnCeliminar.setBorderPainted(false);
+        btnCeliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCeliminar.setFocusPainted(false);
         btnCeliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCeliminarActionPerformed(evt);
             }
         });
-        jPanel15.add(btnCeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(367, 244, -1, -1));
+        panelClientes.add(btnCeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 140, 40));
 
+        btnCmostrar.setBackground(new java.awt.Color(62, 131, 42));
+        btnCmostrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnCmostrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCmostrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-list-lined-32.png"))); // NOI18N
         btnCmostrar.setText("Mostrar");
+        btnCmostrar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnCmostrar.setBorderPainted(false);
+        btnCmostrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCmostrar.setFocusPainted(false);
         btnCmostrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCmostrarActionPerformed(evt);
             }
         });
-        jPanel15.add(btnCmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(526, 244, -1, -1));
+        panelClientes.add(btnCmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 250, 140, 40));
 
-        jTabbedPane1.addTab("CLIENTES", jPanel15);
+        paneles.addTab("CLIENTES", panelClientes);
 
-        jPanel16.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel16.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jTabbedPane1.addTab("USUARIOS", jPanel16);
+        panelUsuarios.setBackground(new java.awt.Color(255, 255, 255));
+        panelUsuarios.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        paneles.addTab("USUARIOS", panelUsuarios);
 
-        getContentPane().add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, 910, 650));
+        getContentPane().add(paneles, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, 910, 650));
 
-        jPanel10.setBackground(new java.awt.Color(45, 156, 35));
-        jPanel10.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelNav.setBackground(new java.awt.Color(45, 156, 35));
+        panelNav.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         sec01.setBackground(new java.awt.Color(45, 156, 35));
         sec01.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1206,7 +1501,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec01MouseExited(evt);
             }
         });
-        jPanel10.add(sec01, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 50));
+        panelNav.add(sec01, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 50));
 
         sec02.setBackground(new java.awt.Color(45, 156, 35));
         sec02.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1228,7 +1523,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec02MouseExited(evt);
             }
         });
-        jPanel10.add(sec02, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 190, 50));
+        panelNav.add(sec02, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 190, 50));
 
         sec03.setBackground(new java.awt.Color(45, 156, 35));
         sec03.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1250,7 +1545,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec03MouseExited(evt);
             }
         });
-        jPanel10.add(sec03, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 190, 50));
+        panelNav.add(sec03, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 190, 50));
 
         sec04.setBackground(new java.awt.Color(45, 156, 35));
         sec04.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1272,7 +1567,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec04MouseExited(evt);
             }
         });
-        jPanel10.add(sec04, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 190, 50));
+        panelNav.add(sec04, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 190, 50));
 
         sec05.setBackground(new java.awt.Color(45, 156, 35));
         sec05.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1294,7 +1589,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec05MouseExited(evt);
             }
         });
-        jPanel10.add(sec05, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 190, 50));
+        panelNav.add(sec05, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 190, 50));
 
         sec06.setBackground(new java.awt.Color(45, 156, 35));
         sec06.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1316,7 +1611,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec06MouseExited(evt);
             }
         });
-        jPanel10.add(sec06, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 250, 190, 50));
+        panelNav.add(sec06, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 250, 190, 50));
 
         sec07.setBackground(new java.awt.Color(45, 156, 35));
         sec07.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1338,7 +1633,7 @@ public class Plataforma extends javax.swing.JFrame {
                 sec07MouseExited(evt);
             }
         });
-        jPanel10.add(sec07, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 300, 190, 50));
+        panelNav.add(sec07, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 300, 190, 50));
 
         sec08.setBackground(new java.awt.Color(45, 156, 35));
         sec08.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1360,9 +1655,9 @@ public class Plataforma extends javax.swing.JFrame {
                 sec08MouseExited(evt);
             }
         });
-        jPanel10.add(sec08, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 350, 190, 50));
+        panelNav.add(sec08, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 350, 190, 50));
 
-        getContentPane().add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 190, 480));
+        getContentPane().add(panelNav, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 190, 480));
 
         pack();
         setLocationRelativeTo(null);
@@ -1375,30 +1670,6 @@ public class Plataforma extends javax.swing.JFrame {
         actualizarTablaProducto();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void limpiarRegistrosProductos() {
-        txtPnombre.setText("");
-        txtPconcentracion.setText("");
-        txtPfechaVenc.setText("");
-        txtPprecio.setText("");
-        txtPstock.setText("");
-    }
-
-    private void limpiarRegistrosEmpleados() {
-        txtEnombres.setText("");
-        txtEapellidos.setText("");
-        txtEdni.setText("");
-        txtEsueldo.setText("");
-        txtEcargo.setText("");
-    }
-
-    private void limpiarRegistrosClientes() {
-        txtCapellidos.setText("");
-        txtCdni.setText("");
-        txtCnombres.setText("");
-        txtCrazon.setText("");
-        txtCruc.setText("");
-    }
-
     private void btnPregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPregistrarActionPerformed
 
         try {
@@ -1408,90 +1679,76 @@ public class Plataforma extends javax.swing.JFrame {
             float precio = Float.parseFloat(txtPprecio.getText());
             String concentracion = txtPconcentracion.getText();
             String fechaVecn = txtPfechaVenc.getText();
+
             productoJDBC.insert(new Producto(presentacion, nombre, concentracion, stock, precio, fechaVecn));
             limpiarRegistrosProductos();
+
             JOptionPane.showMessageDialog(this, "Producto Registrado");
-        } catch (Exception e) {
+        } catch (HeadlessException | NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
         }
 
     }//GEN-LAST:event_btnPregistrarActionPerformed
 
     private void btnAgregarCarritoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarCarritoActionPerformed
-        int idProductoo = Integer.parseInt(txtVproducto.getText());
-        int cantidad = Integer.parseInt(txtVcantidad.getText());
-        int posPro = 0;
+        try {
+            int idProductoo = Integer.parseInt(txtVproducto.getText());
+            int cantidad = Integer.parseInt(txtVcantidad.getText());
+            int posPro = 0;
 
-        for (int i = 0; i < productos.size(); i++) {
-            if (productos.get(i).getIdProducto() == idProductoo) {
-                posPro = i;
-                break;
+            for (int i = 0; i < productos.size(); i++) {
+                if (productos.get(i).getIdProducto() == idProductoo) {
+                    posPro = i;
+                    break;
+                }
             }
+
+            detalles.add(new DetalleVenta(productos.get(posPro), cantidad));
+
+            actualizarTablaDetalle();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
         }
 
-        detalles.add(new DetalleVenta(productos.get(posPro), cantidad));
-
-        int nRow = modeloDetalles.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloDetalles.removeRow(i);
-        }
-
-        float suma = 0;
-        for (int i = 0; i < detalles.size(); i++) {
-            modeloDetalles.addRow(new Object[]{
-                detalles.get(i).getProducto().getNombreProducto(),
-                detalles.get(i).getProducto().getPrecioVenta(),
-                detalles.get(i).getCantidad(),
-                detalles.get(i).getImporte(),});
-            suma += detalles.get(i).getImporte();
-        }
-
-        txtVmonto.setText("" + suma);
 
     }//GEN-LAST:event_btnAgregarCarritoActionPerformed
 
     private void btnProcesarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarVentaActionPerformed
+        try {
+            int idClientee = Integer.parseInt(txtVcliente.getText());
+            int posCli = 0;
 
-        int idClientee = Integer.parseInt(txtVcliente.getText());
-        int posCli = 0;
-        int posEmp = 0;
-
-        for (int i = 0; i < clientes.size(); i++) {
-            if (clientes.get(i).getIdCliente() == idClientee) {
-                posCli = i;
-                break;
+            for (int i = 0; i < clientes.size(); i++) {
+                if (clientes.get(i).getIdCliente() == idClientee) {
+                    posCli = i;
+                    break;
+                }
             }
+
+            String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
+
+            ventaJDBC.insert(new Venta(empleados.get(idEmpleadoActual),
+                    clientes.get(posCli), detalles, metodoPago));
+
+            detalles = new ArrayList<>();
+
+            eliminarTodasLasFilas(modeloDetalles);
+
+            JOptionPane.showMessageDialog(this, "Venta procesada");
+        } catch (HeadlessException | NumberFormatException e) {
+            JOptionPane.showConfirmDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
         }
 
-        for (int i = 0; i < empleados.size(); i++) {
-            if (empleados.get(i).getidEmpleado() == idEmpleado) {
-                posEmp = i;
-                break;
-            }
-        }
-
-        String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
-
-        ventaJDBC.insert(new Venta(empleados.get(posEmp),
-                clientes.get(posCli), detalles, metodoPago));
-
-        detalles = new ArrayList<>();
-        JOptionPane.showMessageDialog(this, "Venta procesada");
-
-        int nRow = modeloDetalles.getRowCount();
-        for (int i = nRow - 1; i >= 0; i--) {
-            modeloDetalles.removeRow(i);
-        }
 
     }//GEN-LAST:event_btnProcesarVentaActionPerformed
 
-    private void tblCventasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCventasMouseClicked
-        int x = tblCventas.getSelectedRow();
+    private void tblVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVentasMouseClicked
+        int x = tblVentas.getSelectedRow();
 
         actualizarTablaDetalle(x);
 
         jDialogDetalles.setVisible(true);
-    }//GEN-LAST:event_tblCventasMouseClicked
+    }//GEN-LAST:event_tblVentasMouseClicked
 
     private void btnPmostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPmostrarActionPerformed
         productos = productoJDBC.select();
@@ -1504,6 +1761,8 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_btnPmostrarActionPerformed
 
     private void tblProductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProductosMouseClicked
+        /*Con este evento cargamos las cajas de texto con los valores de la fila
+        seleccionada para eliminar o actualiziar despues*/
         try {
             int x = tblProductos.getSelectedRow();
 
@@ -1537,13 +1796,15 @@ public class Plataforma extends javax.swing.JFrame {
 
             limpiarRegistrosProductos();
             JOptionPane.showMessageDialog(this, "Producto actualizado");
-        } catch (Exception e) {
+        } catch (HeadlessException | NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
         }
 
     }//GEN-LAST:event_btnPactualizarActionPerformed
 
     private void btnPeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeliminarActionPerformed
+        /*la variable idProducto se actualiza al hacer click en alguna fila 
+        de la tabla productos*/
         productoJDBC.delete(new Producto(idProducto));
 
         limpiarRegistrosProductos();
@@ -1574,21 +1835,33 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_cabeceraMousePressed
 
     private void btnEregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEregistrarActionPerformed
-        try {
-            String nombres = txtEnombres.getText();
-            String apellidos = txtEapellidos.getText();
-            String dni = txtEdni.getText();
-            String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
-            float sueldo = Float.parseFloat(txtEsueldo.getText());
-            String cargo = txtEcargo.getText();
+        if (txtEdni.getText().length() == 8) {
+            try {
+                String nombres = txtEnombres.getText();
+                String apellidos = txtEapellidos.getText();
+                String dni = txtEdni.getText();
+                String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
+                float sueldo = Float.parseFloat(txtEsueldo.getText());
+                String cargo = txtEcargo.getText();
 
-            empleadoJDBC.insert(new Empleado(nombres, apellidos, dni, tipo, sueldo, cargo));
+                empleadoJDBC.insert(new Empleado(nombres, apellidos, dni, tipo, sueldo, cargo));
 
-            limpiarRegistrosEmpleados();
-            JOptionPane.showMessageDialog(this, "Empleado Regisrado");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+                limpiarRegistrosEmpleados();
+
+                if (empleadoJDBC.getError()) {
+                    JOptionPane.showMessageDialog(this, "El DNI ya se encuentra en uso");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Empleado Regisrado");
+                }
+
+            } catch (HeadlessException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+            }
+        } else {
+            txtEdni.setText("");
+            JOptionPane.showMessageDialog(this, "DNI no válido");
         }
+
 
     }//GEN-LAST:event_btnEregistrarActionPerformed
 
@@ -1622,20 +1895,31 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_tblEmpleadosMouseClicked
 
     private void btnEactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEactualizarActionPerformed
-        try {
-            String nombre = txtEnombres.getText();
-            String apellidos = txtEapellidos.getText();
-            String dni = txtEdni.getText();
-            String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
-            float sueldo = Float.parseFloat(txtEsueldo.getText());
-            String cargo = txtEcargo.getText();
+        if (txtEdni.getText().length() == 8) {
+            try {
+                String nombre = txtEnombres.getText();
+                String apellidos = txtEapellidos.getText();
+                String dni = txtEdni.getText();
+                String tipo = (String) cmbEtipoEmpleado.getSelectedItem();
+                float sueldo = Float.parseFloat(txtEsueldo.getText());
+                String cargo = txtEcargo.getText();
 
-            empleadoJDBC.update(new Empleado(idEmpleado, nombre, apellidos, dni, tipo, sueldo, cargo));
+                empleadoJDBC.update(new Empleado(idEmpleado, nombre, apellidos, dni, tipo, sueldo, cargo));
 
-            limpiarRegistrosEmpleados();
-            JOptionPane.showMessageDialog(this, "Empleado Actualizado");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+                limpiarRegistrosEmpleados();
+
+                if (empleadoJDBC.getError()) {
+                    JOptionPane.showMessageDialog(this, "El DNI ya se encuentra en uso");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Empleado Actualizado");
+                }
+
+            } catch (HeadlessException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+            }
+        } else {
+            txtEdni.setText("");
+            JOptionPane.showMessageDialog(this, "DNI no válido");
         }
 
 
@@ -1657,6 +1941,7 @@ public class Plataforma extends javax.swing.JFrame {
 
     private void txtEdniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEdniKeyTyped
         validarSoloNumeros(evt);
+        limitarEntradaDatos(txtEdni, 8, evt);
     }//GEN-LAST:event_txtEdniKeyTyped
 
     private void txtEsueldoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEsueldoKeyTyped
@@ -1911,73 +2196,73 @@ public class Plataforma extends javax.swing.JFrame {
         limitarEntradaDatos(txtCruc, 11, evt);
     }//GEN-LAST:event_txtCrucKeyTyped
 
-    private void tblCventasReporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCventasReporteMouseClicked
+    private void tblVentasReporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVentasReporteMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_tblCventasReporteMouseClicked
+    }//GEN-LAST:event_tblVentasReporteMouseClicked
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        
+
         ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
-        
+
         ventas.forEach(venta -> System.out.println(venta + "\n"));
-        
+
         actualizarTablaVenta();
-        
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
-        
+
         ventas.forEach(venta -> System.out.println(venta + "\n"));
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void btnVactualizarReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVactualizarReporteActionPerformed
         ventas = ventaJDBC.select(empleados, clientes, productos);
-        actualizarTablaVenta();    
+        actualizarTablaVenta();
     }//GEN-LAST:event_btnVactualizarReporteActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
-        
+
         ventas.forEach(venta -> System.out.println(venta + "\n"));
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
-        
+
         ventas.forEach(venta -> System.out.println(venta + "\n"));
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void sec01MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseClicked
-        jTabbedPane1.setSelectedIndex(0);
+        paneles.setSelectedIndex(0);
     }//GEN-LAST:event_sec01MouseClicked
 
     private void sec02MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseClicked
-        jTabbedPane1.setSelectedIndex(1);
+        paneles.setSelectedIndex(1);
     }//GEN-LAST:event_sec02MouseClicked
 
     private void sec03MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseClicked
-        jTabbedPane1.setSelectedIndex(2);
+        paneles.setSelectedIndex(2);
     }//GEN-LAST:event_sec03MouseClicked
 
     private void sec04MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec04MouseClicked
-        jTabbedPane1.setSelectedIndex(3);
+        paneles.setSelectedIndex(3);
     }//GEN-LAST:event_sec04MouseClicked
 
     private void sec05MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec05MouseClicked
-        jTabbedPane1.setSelectedIndex(4);
+        paneles.setSelectedIndex(4);
     }//GEN-LAST:event_sec05MouseClicked
 
     private void sec06MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec06MouseClicked
-        jTabbedPane1.setSelectedIndex(5);
+        paneles.setSelectedIndex(5);
     }//GEN-LAST:event_sec06MouseClicked
 
     private void sec07MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec07MouseClicked
-        jTabbedPane1.setSelectedIndex(6);
+        paneles.setSelectedIndex(6);
     }//GEN-LAST:event_sec07MouseClicked
 
     private void sec08MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec08MouseClicked
@@ -1988,6 +2273,19 @@ public class Plataforma extends javax.swing.JFrame {
             this.dispose();
         }
     }//GEN-LAST:event_sec08MouseClicked
+
+    private void btnVactualizarReporte1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVactualizarReporte1ActionPerformed
+        // Generar Reporte 
+
+    }//GEN-LAST:event_btnVactualizarReporte1ActionPerformed
+
+    private void txtCnombresFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCnombresFocusGained
+        txtCnombres.setBackground(new Color(240, 240, 240));
+    }//GEN-LAST:event_txtCnombresFocusGained
+
+    private void txtCnombresFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCnombresFocusLost
+        txtCnombres.setBackground(new Color(255, 255, 255));
+    }//GEN-LAST:event_txtCnombresFocusLost
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -2030,7 +2328,7 @@ public class Plataforma extends javax.swing.JFrame {
         sec06.setBackground(new Color(13, 44, 10));
         sec07.setBackground(new Color(13, 44, 10));
         sec08.setBackground(new Color(13, 44, 10));
-        
+
         sec.setBackground(new Color(19, 66, 15));
         select.setBackground(new Color(255, 255, 255));
     }
@@ -2059,6 +2357,29 @@ public class Plataforma extends javax.swing.JFrame {
         }
     }
 
+    private void limpiarRegistrosProductos() {
+        txtPnombre.setText("");
+        txtPconcentracion.setText("");
+        txtPfechaVenc.setText("");
+        txtPprecio.setText("");
+        txtPstock.setText("");
+    }
+
+    private void limpiarRegistrosEmpleados() {
+        txtEnombres.setText("");
+        txtEapellidos.setText("");
+        txtEdni.setText("");
+        txtEsueldo.setText("");
+        txtEcargo.setText("");
+    }
+
+    private void limpiarRegistrosClientes() {
+        txtCapellidos.setText("");
+        txtCdni.setText("");
+        txtCnombres.setText("");
+        txtCrazon.setText("");
+        txtCruc.setText("");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarCarrito;
@@ -2081,6 +2402,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton btnSelectProducto;
     private javax.swing.JButton btnVactualizar;
     private javax.swing.JButton btnVactualizarReporte;
+    private javax.swing.JButton btnVactualizarReporte1;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel cabecera;
     private javax.swing.JComboBox<String> cmbEtipoEmpleado;
@@ -2119,15 +2441,6 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -2138,12 +2451,35 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator10;
+    private javax.swing.JSeparator jSeparator11;
+    private javax.swing.JSeparator jSeparator12;
+    private javax.swing.JSeparator jSeparator13;
+    private javax.swing.JSeparator jSeparator14;
+    private javax.swing.JSeparator jSeparator15;
+    private javax.swing.JSeparator jSeparator16;
+    private javax.swing.JSeparator jSeparator17;
+    private javax.swing.JSeparator jSeparator18;
+    private javax.swing.JSeparator jSeparator19;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JSeparator jSeparator9;
+    private javax.swing.JPanel panelCarrito;
+    private javax.swing.JPanel panelClientes;
+    private javax.swing.JPanel panelEmpleados;
+    private javax.swing.JPanel panelInfoUsuario;
+    private javax.swing.JPanel panelNav;
+    private javax.swing.JPanel panelProductos;
+    private javax.swing.JPanel panelReportes;
+    private javax.swing.JPanel panelUsuarios;
+    private javax.swing.JPanel panelVentas;
+    private javax.swing.JTabbedPane paneles;
     private javax.swing.JRadioButton rbtCjuridico;
     private javax.swing.JRadioButton rbtCnatural;
     private javax.swing.JLabel sec01;
@@ -2156,13 +2492,13 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel sec08;
     private javax.swing.JTable tblClientes;
     private javax.swing.JTable tblClientesDialog;
-    private javax.swing.JTable tblCventas;
-    private javax.swing.JTable tblCventasReporte;
     private javax.swing.JTable tblDetalles;
     private javax.swing.JTable tblDetallesDialog;
     private javax.swing.JTable tblEmpleados;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTable tblProductosDialog;
+    private javax.swing.JTable tblVentas;
+    private javax.swing.JTable tblVentasReporte;
     private javax.swing.JTextField txtCapellidos;
     private javax.swing.JTextField txtCdni;
     private javax.swing.JTextField txtCnombres;
