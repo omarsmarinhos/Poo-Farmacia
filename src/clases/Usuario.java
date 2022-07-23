@@ -3,19 +3,22 @@ package clases;
 public class Usuario {
     
     private int idUsuario;
+    private Empleado empleado;
     private String user;
     private String password;
 
     public Usuario() {
     }
 
-    public Usuario(String user, String password) {
+    public Usuario(Empleado empleado, String user, String password) {
+        this.empleado = empleado;
         this.user = user;
         this.password = password;
     }
     
-    public Usuario(int idUsuario, String user, String password) {
+    public Usuario(int idUsuario, Empleado empleado, String user, String password) {
         this.idUsuario = idUsuario;
+        this.empleado = empleado;
         this.user = user;
         this.password = password;
     }
@@ -26,6 +29,14 @@ public class Usuario {
 
     public void setIdUsuario(int idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public Empleado getEmpleado() {
+        return empleado;
+    }
+
+    public void setEmpleado(Empleado empleado) {
+        this.empleado = empleado;
     }
 
     public String getUser() {

@@ -224,7 +224,7 @@ public class VentaJDBC implements VentaDAO {
 
     }
 
-    static int getIdProducto(ArrayList<Producto> productos, int idProducto) {
+    private int getIdProducto(ArrayList<Producto> productos, int idProducto) {
         int id = 0;
         for (int i = 0; i < productos.size(); i++) {
             if (idProducto == productos.get(i).getIdProducto()) {
@@ -235,7 +235,7 @@ public class VentaJDBC implements VentaDAO {
         return id;
     }
 
-    static int getIdEmpleado(ArrayList<Empleado> empleados, int idEmpleado) {
+    private int getIdEmpleado(ArrayList<Empleado> empleados, int idEmpleado) {
         int id = 0;
         for (int i = 0; i < empleados.size(); i++) {
             if (idEmpleado == empleados.get(i).getidEmpleado()) {
@@ -246,7 +246,7 @@ public class VentaJDBC implements VentaDAO {
         return id;
     }
 
-    static int getIdCliente(ArrayList<Cliente> clientes, int idCliente) {
+    private int getIdCliente(ArrayList<Cliente> clientes, int idCliente) {
         int id = 0;
         for (int i = 0; i < clientes.size(); i++) {
             if (idCliente == clientes.get(i).getIdCliente()) {

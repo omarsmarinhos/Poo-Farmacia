@@ -1,7 +1,9 @@
 package ventanas;
 
+import report.Reporte;
 import clases.*;
 import conexion.*;
+import report.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.HeadlessException;
@@ -20,24 +22,28 @@ public class Plataforma extends javax.swing.JFrame {
     EmpleadoJDBC empleadoJDBC = new EmpleadoJDBC();
     ClienteJDBC clienteJDBC = new ClienteJDBC();
     VentaJDBC ventaJDBC = new VentaJDBC();
+    UsuarioJDBC usuarioJDBC = new UsuarioJDBC();
 
     DefaultTableModel modeloProdcutos = new DefaultTableModel();
     DefaultTableModel modeloClientes = new DefaultTableModel();
     DefaultTableModel modeloEmpleados = new DefaultTableModel();
     DefaultTableModel modeloVentas = new DefaultTableModel();
     DefaultTableModel modeloDetalles = new DefaultTableModel();
+    DefaultTableModel modeloUsuarios = new DefaultTableModel();
 
     ArrayList<Producto> productos = new ArrayList<>();
     ArrayList<Cliente> clientes = new ArrayList<>();
     ArrayList<Empleado> empleados = new ArrayList<>();
     ArrayList<Venta> ventas = new ArrayList<>();
     ArrayList<DetalleVenta> detalles = new ArrayList<>(); //detalles es el carrito
+    ArrayList<Usuario> usuarios = new ArrayList<>();
 
     //variables auxiliares para actualizar registros
     int idProducto;
     int idEmpleado;
     int idCliente;
     int idDetalle;
+    int idUsuario;
 
     //id usuario activo
     int idEmpleadoActual;
@@ -50,6 +56,7 @@ public class Plataforma extends javax.swing.JFrame {
         empleados = empleadoJDBC.select();
         clientes = clienteJDBC.select();
         productos = productoJDBC.select();
+        usuarios = usuarioJDBC.select(empleados);
 
         initComponents();
 
@@ -75,6 +82,8 @@ public class Plataforma extends javax.swing.JFrame {
         formatoCabeceraTabla(tblProductosDialog);
         formatoCabeceraTabla(tblDetallesDialog);
         formatoCabeceraTabla(tblVentasReporte);
+        formatoCabeceraTabla(tblUsuarios);
+        formatoCabeceraTabla(tblEmpleadoDialog);
     }
 
     //Carga los datos del usuario activo
@@ -111,15 +120,19 @@ public class Plataforma extends javax.swing.JFrame {
         modeloDetalles.setColumnIdentifiers(tituloD);
         String tituloV[] = {"id Venta", "Cliente", "Tipo de Pago", "Importe Total", "Fecha"};
         modeloVentas.setColumnIdentifiers(tituloV);
+        String tituloU[] = {"id Usuario", "id Empleado", "Usuario", "Contraseña"};
+        modeloUsuarios.setColumnIdentifiers(tituloU);
         tblProductos.setModel(modeloProdcutos);
         tblEmpleados.setModel(modeloEmpleados);
         tblClientes.setModel(modeloClientes);
         tblDetalles.setModel(modeloDetalles);
         tblVentas.setModel(modeloVentas);
+        tblUsuarios.setModel(modeloUsuarios);
         tblClientesDialog.setModel(modeloClientes);
         tblProductosDialog.setModel(modeloProdcutos);
         tblDetallesDialog.setModel(modeloDetalles);
         tblVentasReporte.setModel(modeloVentas);
+        tblEmpleadoDialog.setModel(modeloEmpleados);
     }
 
     //Elimina todas la filas del DefaultTableModel enviada por parámetro
@@ -175,6 +188,19 @@ public class Plataforma extends javax.swing.JFrame {
                 cliente.getDni(),
                 cliente.getRuc(),
                 cliente.getRazonSocial()
+            });
+        });
+    }
+
+    private void actualizarTablaUsuario() {
+        eliminarTodasLasFilas(modeloUsuarios);
+
+        usuarios.forEach(usuario -> {
+            modeloUsuarios.addRow(new Object[]{
+                usuario.getIdUsuario(),
+                usuario.getEmpleado().getidEmpleado(),
+                usuario.getUser(),
+                usuario.getPassword()
             });
         });
     }
@@ -236,6 +262,9 @@ public class Plataforma extends javax.swing.JFrame {
         jDialogDetalles = new javax.swing.JDialog();
         jScrollPane9 = new javax.swing.JScrollPane();
         tblDetallesDialog = new javax.swing.JTable();
+        jDialogEmpleado = new javax.swing.JDialog();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        tblEmpleadoDialog = new javax.swing.JTable();
         btnSalir = new javax.swing.JLabel();
         panelInfoUsuario = new javax.swing.JPanel();
         foto = new javax.swing.JLabel();
@@ -356,6 +385,25 @@ public class Plataforma extends javax.swing.JFrame {
         btnCeliminar = new javax.swing.JButton();
         btnCmostrar = new javax.swing.JButton();
         panelUsuarios = new javax.swing.JPanel();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        tblUsuarios = new javax.swing.JTable();
+        btnUmostrar = new javax.swing.JButton();
+        btnUregistrar = new javax.swing.JButton();
+        btnUactualizar = new javax.swing.JButton();
+        btnUeliminar = new javax.swing.JButton();
+        jSeparator21 = new javax.swing.JSeparator();
+        txtUuser = new javax.swing.JTextField();
+        jLabel40 = new javax.swing.JLabel();
+        jSeparator22 = new javax.swing.JSeparator();
+        txtUpass = new javax.swing.JTextField();
+        jLabel41 = new javax.swing.JLabel();
+        jSeparator23 = new javax.swing.JSeparator();
+        txtUrepass = new javax.swing.JTextField();
+        jLabel42 = new javax.swing.JLabel();
+        jSeparator24 = new javax.swing.JSeparator();
+        jLabel43 = new javax.swing.JLabel();
+        txtUempleado = new javax.swing.JTextField();
+        btnSelecEmpleado = new javax.swing.JButton();
         panelNav = new javax.swing.JPanel();
         sec01 = new javax.swing.JLabel();
         sec02 = new javax.swing.JLabel();
@@ -511,6 +559,56 @@ public class Plataforma extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogDetallesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jDialogEmpleado.setLocationByPlatform(true);
+        jDialogEmpleado.setModal(true);
+        jDialogEmpleado.setSize(new java.awt.Dimension(700, 350));
+
+        jScrollPane11.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(32, 131, 42), 1, true));
+
+        tblEmpleadoDialog.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblEmpleadoDialog.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tblEmpleadoDialog.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblEmpleadoDialog.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblEmpleadoDialog.setFocusable(false);
+        tblEmpleadoDialog.setGridColor(new java.awt.Color(51, 51, 51));
+        tblEmpleadoDialog.setRowHeight(25);
+        tblEmpleadoDialog.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblEmpleadoDialog.getTableHeader().setResizingAllowed(false);
+        tblEmpleadoDialog.getTableHeader().setReorderingAllowed(false);
+        tblEmpleadoDialog.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEmpleadoDialogMouseClicked(evt);
+            }
+        });
+        jScrollPane11.setViewportView(tblEmpleadoDialog);
+
+        javax.swing.GroupLayout jDialogEmpleadoLayout = new javax.swing.GroupLayout(jDialogEmpleado.getContentPane());
+        jDialogEmpleado.getContentPane().setLayout(jDialogEmpleadoLayout);
+        jDialogEmpleadoLayout.setHorizontalGroup(
+            jDialogEmpleadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogEmpleadoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jDialogEmpleadoLayout.setVerticalGroup(
+            jDialogEmpleadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogEmpleadoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1473,6 +1571,158 @@ public class Plataforma extends javax.swing.JFrame {
 
         panelUsuarios.setBackground(new java.awt.Color(255, 255, 255));
         panelUsuarios.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jScrollPane10.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
+
+        tblUsuarios.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        tblUsuarios.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tblUsuarios.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblUsuarios.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblUsuarios.setFocusable(false);
+        tblUsuarios.setGridColor(new java.awt.Color(51, 51, 51));
+        tblUsuarios.setRowHeight(25);
+        tblUsuarios.setSelectionBackground(new java.awt.Color(62, 131, 42));
+        tblUsuarios.getTableHeader().setResizingAllowed(false);
+        tblUsuarios.getTableHeader().setReorderingAllowed(false);
+        tblUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblUsuariosMouseClicked(evt);
+            }
+        });
+        jScrollPane10.setViewportView(tblUsuarios);
+
+        panelUsuarios.add(jScrollPane10, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 830, 280));
+
+        btnUmostrar.setBackground(new java.awt.Color(62, 131, 42));
+        btnUmostrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnUmostrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnUmostrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-list-lined-32.png"))); // NOI18N
+        btnUmostrar.setText("Mostrar");
+        btnUmostrar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnUmostrar.setBorderPainted(false);
+        btnUmostrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnUmostrar.setFocusPainted(false);
+        btnUmostrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUmostrarActionPerformed(evt);
+            }
+        });
+        panelUsuarios.add(btnUmostrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 250, 140, 40));
+
+        btnUregistrar.setBackground(new java.awt.Color(62, 131, 42));
+        btnUregistrar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnUregistrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnUregistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-plus-lined-32.png"))); // NOI18N
+        btnUregistrar.setText("Registrar");
+        btnUregistrar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnUregistrar.setBorderPainted(false);
+        btnUregistrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnUregistrar.setFocusPainted(false);
+        btnUregistrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUregistrarActionPerformed(evt);
+            }
+        });
+        panelUsuarios.add(btnUregistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 250, 140, 40));
+
+        btnUactualizar.setBackground(new java.awt.Color(62, 131, 42));
+        btnUactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnUactualizar.setForeground(new java.awt.Color(255, 255, 255));
+        btnUactualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-reload-thin-32.png"))); // NOI18N
+        btnUactualizar.setText("Actualizar");
+        btnUactualizar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnUactualizar.setBorderPainted(false);
+        btnUactualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnUactualizar.setFocusPainted(false);
+        btnUactualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUactualizarActionPerformed(evt);
+            }
+        });
+        panelUsuarios.add(btnUactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 250, 140, 40));
+
+        btnUeliminar.setBackground(new java.awt.Color(62, 131, 42));
+        btnUeliminar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnUeliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnUeliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-text-minus-lined-32.png"))); // NOI18N
+        btnUeliminar.setText("Eliminar");
+        btnUeliminar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnUeliminar.setBorderPainted(false);
+        btnUeliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnUeliminar.setFocusPainted(false);
+        btnUeliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUeliminarActionPerformed(evt);
+            }
+        });
+        panelUsuarios.add(btnUeliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 140, 40));
+
+        jSeparator21.setForeground(new java.awt.Color(0, 0, 0));
+        panelUsuarios.add(jSeparator21, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 90, 200, 10));
+
+        txtUuser.setBorder(null);
+        panelUsuarios.add(txtUuser, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 70, 200, 25));
+
+        jLabel40.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel40.setText("Nombre de usuario");
+        panelUsuarios.add(jLabel40, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 70, -1, -1));
+
+        jSeparator22.setForeground(new java.awt.Color(0, 0, 0));
+        panelUsuarios.add(jSeparator22, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 140, 200, 10));
+
+        txtUpass.setBorder(null);
+        panelUsuarios.add(txtUpass, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, 200, 25));
+
+        jLabel41.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel41.setText("Contraseña");
+        panelUsuarios.add(jLabel41, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, -1));
+
+        jSeparator23.setForeground(new java.awt.Color(0, 0, 0));
+        panelUsuarios.add(jSeparator23, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 190, 200, 10));
+
+        txtUrepass.setBorder(null);
+        panelUsuarios.add(txtUrepass, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 200, 25));
+
+        jLabel42.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel42.setText("Confirmar contraseña");
+        panelUsuarios.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, -1, -1));
+
+        jSeparator24.setForeground(new java.awt.Color(0, 0, 0));
+        panelUsuarios.add(jSeparator24, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 90, 200, 10));
+
+        jLabel43.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel43.setText("Empleado");
+        panelUsuarios.add(jLabel43, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 70, -1, -1));
+
+        txtUempleado.setEditable(false);
+        txtUempleado.setBorder(null);
+        panelUsuarios.add(txtUempleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 70, 200, 25));
+
+        btnSelecEmpleado.setBackground(new java.awt.Color(34, 73, 24));
+        btnSelecEmpleado.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnSelecEmpleado.setForeground(new java.awt.Color(255, 255, 255));
+        btnSelecEmpleado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnSelecEmpleado.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnSelecEmpleado.setBorderPainted(false);
+        btnSelecEmpleado.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSelecEmpleado.setFocusPainted(false);
+        btnSelecEmpleado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelecEmpleadoActionPerformed(evt);
+            }
+        });
+        panelUsuarios.add(btnSelecEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 70, 40));
+
         paneles.addTab("USUARIOS", panelUsuarios);
 
         getContentPane().add(paneles, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, 910, 650));
@@ -2205,16 +2455,12 @@ public class Plataforma extends javax.swing.JFrame {
 
         ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
 
-        ventas.forEach(venta -> System.out.println(venta + "\n"));
-
         actualizarTablaVenta();
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
-
-        ventas.forEach(venta -> System.out.println(venta + "\n"));
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -2225,15 +2471,11 @@ public class Plataforma extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
-
-        ventas.forEach(venta -> System.out.println(venta + "\n"));
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
-
-        ventas.forEach(venta -> System.out.println(venta + "\n"));
         actualizarTablaVenta();
     }//GEN-LAST:event_jButton5ActionPerformed
 
@@ -2275,8 +2517,9 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_sec08MouseClicked
 
     private void btnVactualizarReporte1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVactualizarReporte1ActionPerformed
-        // Generar Reporte 
-
+        // Generar Reporte pruebas
+        Reporte reporte = new Reporte(Reporte.COMPROBANTE);
+        reporte.crearReporte(ventas, 2);
     }//GEN-LAST:event_btnVactualizarReporte1ActionPerformed
 
     private void txtCnombresFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCnombresFocusGained
@@ -2286,6 +2529,41 @@ public class Plataforma extends javax.swing.JFrame {
     private void txtCnombresFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCnombresFocusLost
         txtCnombres.setBackground(new Color(255, 255, 255));
     }//GEN-LAST:event_txtCnombresFocusLost
+
+    private void tblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUsuariosMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblUsuariosMouseClicked
+
+    private void btnUmostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUmostrarActionPerformed
+        usuarioJDBC.select(empleados);
+        actualizarTablaUsuario();
+    }//GEN-LAST:event_btnUmostrarActionPerformed
+
+    private void btnUregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUregistrarActionPerformed
+
+    }//GEN-LAST:event_btnUregistrarActionPerformed
+
+    private void btnUactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUactualizarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUactualizarActionPerformed
+
+    private void btnUeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUeliminarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUeliminarActionPerformed
+
+    private void btnSelecEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecEmpleadoActionPerformed
+        empleados = empleadoJDBC.select();
+        actualizarTablaEmpleado();
+        jDialogEmpleado.setVisible(true);
+    }//GEN-LAST:event_btnSelecEmpleadoActionPerformed
+
+    private void tblEmpleadoDialogMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEmpleadoDialogMouseClicked
+        int x = tblEmpleadoDialog.getSelectedRow();
+        idEmpleado = empleados.get(x).getidEmpleado();
+
+        txtUempleado.setText("" + idEmpleado);
+        jDialogEmpleado.dispose();
+    }//GEN-LAST:event_tblEmpleadoDialogMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -2399,7 +2677,12 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton btnProcesarVenta;
     private javax.swing.JLabel btnSalir;
     private javax.swing.JButton btnSelecCliente;
+    private javax.swing.JButton btnSelecEmpleado;
     private javax.swing.JButton btnSelectProducto;
+    private javax.swing.JButton btnUactualizar;
+    private javax.swing.JButton btnUeliminar;
+    private javax.swing.JButton btnUmostrar;
+    private javax.swing.JButton btnUregistrar;
     private javax.swing.JButton btnVactualizar;
     private javax.swing.JButton btnVactualizarReporte;
     private javax.swing.JButton btnVactualizarReporte1;
@@ -2416,6 +2699,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JDialog jDialogClientes;
     private javax.swing.JDialog jDialogDetalles;
+    private javax.swing.JDialog jDialogEmpleado;
     private javax.swing.JDialog jDialogproducto;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -2439,9 +2723,15 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel40;
+    private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
+    private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
+    private javax.swing.JScrollPane jScrollPane11;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -2463,6 +2753,10 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator19;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator20;
+    private javax.swing.JSeparator jSeparator21;
+    private javax.swing.JSeparator jSeparator22;
+    private javax.swing.JSeparator jSeparator23;
+    private javax.swing.JSeparator jSeparator24;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
@@ -2494,9 +2788,11 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JTable tblClientesDialog;
     private javax.swing.JTable tblDetalles;
     private javax.swing.JTable tblDetallesDialog;
+    private javax.swing.JTable tblEmpleadoDialog;
     private javax.swing.JTable tblEmpleados;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTable tblProductosDialog;
+    private javax.swing.JTable tblUsuarios;
     private javax.swing.JTable tblVentas;
     private javax.swing.JTable tblVentasReporte;
     private javax.swing.JTextField txtCapellidos;
@@ -2516,7 +2812,11 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JTextField txtPprecio;
     private javax.swing.JTextField txtPstock;
     private javax.swing.JLabel txtRolActivo;
+    private javax.swing.JTextField txtUempleado;
+    private javax.swing.JTextField txtUpass;
+    private javax.swing.JTextField txtUrepass;
     private javax.swing.JLabel txtUsuarioActivo;
+    private javax.swing.JTextField txtUuser;
     private javax.swing.JTextField txtVcantidad;
     private javax.swing.JTextField txtVcliente;
     private javax.swing.JTextField txtVmonto;
