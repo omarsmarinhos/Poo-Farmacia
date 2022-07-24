@@ -19,7 +19,7 @@ public class Venta {
         this.cliente = cliente;
         this.detalles = detalles;
         this.metodoPago = metodoPago;
-        this.fecha = fecha;
+        this.fecha = fecha.substring(0, fecha.length()-2);;
     }
 
     public Venta(Empleado empleado, Cliente cliente, ArrayList<DetalleVenta> detalles, String metodoPago) {
@@ -112,7 +112,5 @@ public class Venta {
         }
         return karma;
     }
-    
-    
     
 }
