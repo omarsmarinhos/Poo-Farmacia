@@ -10,6 +10,7 @@ import java.awt.HeadlessException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -51,12 +52,13 @@ public class Plataforma extends javax.swing.JFrame {
     Color colorEntrar = new Color(34, 117, 26);
     Color colorSalir = new Color(45, 156, 35);
 
+    Pass password = new Pass();
+
     public Plataforma(int id_empleado) {
         //Trea las tablas de la base de datos
         empleados = empleadoJDBC.select();
         clientes = clienteJDBC.select();
         productos = productoJDBC.select();
-        usuarios = usuarioJDBC.select(empleados);
 
         initComponents();
 
@@ -70,6 +72,11 @@ public class Plataforma extends javax.swing.JFrame {
 
         btnCactualizar.setEnabled(false);
         btnCeliminar.setEnabled(false);
+
+        btnUactualizar.setEnabled(false);
+        btnUeliminar.setEnabled(false);
+
+        rbtCnatural.setSelected(true);
 
         actualizarEmpleadoActual(id_empleado);
 
@@ -395,15 +402,12 @@ public class Plataforma extends javax.swing.JFrame {
         txtUuser = new javax.swing.JTextField();
         jLabel40 = new javax.swing.JLabel();
         jSeparator22 = new javax.swing.JSeparator();
-        txtUpass = new javax.swing.JTextField();
         jLabel41 = new javax.swing.JLabel();
-        jSeparator23 = new javax.swing.JSeparator();
-        txtUrepass = new javax.swing.JTextField();
-        jLabel42 = new javax.swing.JLabel();
         jSeparator24 = new javax.swing.JSeparator();
         jLabel43 = new javax.swing.JLabel();
         txtUempleado = new javax.swing.JTextField();
         btnSelecEmpleado = new javax.swing.JButton();
+        txtUpass = new javax.swing.JPasswordField();
         panelNav = new javax.swing.JPanel();
         sec01 = new javax.swing.JLabel();
         sec02 = new javax.swing.JLabel();
@@ -893,6 +897,11 @@ public class Plataforma extends javax.swing.JFrame {
         panelCarrito.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, -1, -1));
 
         txtVcantidad.setBorder(null);
+        txtVcantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtVcantidadKeyTyped(evt);
+            }
+        });
         panelCarrito.add(txtVcantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 120, 200, 25));
 
         jScrollPane2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(62, 131, 42), 1, true));
@@ -1481,6 +1490,7 @@ public class Plataforma extends javax.swing.JFrame {
         panelClientes.add(rbtCjuridico, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 110, -1, -1));
 
         txtCrazon.setBorder(null);
+        txtCrazon.setEnabled(false);
         panelClientes.add(txtCrazon, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 200, 200, 25));
 
         jLabel36.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -1492,6 +1502,7 @@ public class Plataforma extends javax.swing.JFrame {
         panelClientes.add(jLabel37, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 200, -1, -1));
 
         txtCruc.setBorder(null);
+        txtCruc.setEnabled(false);
         txtCruc.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCrucKeyTyped(evt);
@@ -1680,22 +1691,9 @@ public class Plataforma extends javax.swing.JFrame {
         jSeparator22.setForeground(new java.awt.Color(0, 0, 0));
         panelUsuarios.add(jSeparator22, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 140, 200, 10));
 
-        txtUpass.setBorder(null);
-        panelUsuarios.add(txtUpass, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, 200, 25));
-
         jLabel41.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel41.setText("Contraseña");
         panelUsuarios.add(jLabel41, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, -1));
-
-        jSeparator23.setForeground(new java.awt.Color(0, 0, 0));
-        panelUsuarios.add(jSeparator23, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 190, 200, 10));
-
-        txtUrepass.setBorder(null);
-        panelUsuarios.add(txtUrepass, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 200, 25));
-
-        jLabel42.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel42.setText("Confirmar contraseña");
-        panelUsuarios.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, -1, -1));
 
         jSeparator24.setForeground(new java.awt.Color(0, 0, 0));
         panelUsuarios.add(jSeparator24, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 90, 200, 10));
@@ -1722,6 +1720,9 @@ public class Plataforma extends javax.swing.JFrame {
             }
         });
         panelUsuarios.add(btnSelecEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 70, 40));
+
+        txtUpass.setBorder(null);
+        panelUsuarios.add(txtUpass, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, 200, 25));
 
         paneles.addTab("USUARIOS", panelUsuarios);
 
@@ -1956,40 +1957,44 @@ public class Plataforma extends javax.swing.JFrame {
             detalles.add(new DetalleVenta(productos.get(posPro), cantidad));
 
             actualizarTablaDetalle();
+            txtVproducto.setText("");
+            txtVcantidad.setText("");
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+            JOptionPane.showMessageDialog(this, "Seleccionar el producto y agregar una cantidad.");
         }
 
 
     }//GEN-LAST:event_btnAgregarCarritoActionPerformed
 
     private void btnProcesarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarVentaActionPerformed
-        try {
-            int idClientee = Integer.parseInt(txtVcliente.getText());
-            int posCli = 0;
+        if (detalles.size() > 0) {
+            try {
+                int idClientee = Integer.parseInt(txtVcliente.getText());
+                int posCli = 0;
 
-            for (int i = 0; i < clientes.size(); i++) {
-                if (clientes.get(i).getIdCliente() == idClientee) {
-                    posCli = i;
-                    break;
+                for (int i = 0; i < clientes.size(); i++) {
+                    if (clientes.get(i).getIdCliente() == idClientee) {
+                        posCli = i;
+                        break;
+                    }
                 }
+
+                String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
+
+                ventaJDBC.insert(new Venta(empleados.get(idEmpleadoActual),
+                        clientes.get(posCli), detalles, metodoPago));
+
+                detalles = new ArrayList<>();
+
+                eliminarTodasLasFilas(modeloDetalles);
+
+                JOptionPane.showMessageDialog(this, "Venta procesada.");
+            } catch (HeadlessException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Seleccionar un cliente.");
             }
-
-            String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
-
-            ventaJDBC.insert(new Venta(empleados.get(idEmpleadoActual),
-                    clientes.get(posCli), detalles, metodoPago));
-
-            detalles = new ArrayList<>();
-
-            eliminarTodasLasFilas(modeloDetalles);
-
-            JOptionPane.showMessageDialog(this, "Venta procesada");
-        } catch (HeadlessException | NumberFormatException e) {
-            JOptionPane.showConfirmDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        } else {
+            JOptionPane.showMessageDialog(this, "El carrito está vacío.");
         }
-
-
     }//GEN-LAST:event_btnProcesarVentaActionPerformed
 
     private void tblVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVentasMouseClicked
@@ -2228,54 +2233,98 @@ public class Plataforma extends javax.swing.JFrame {
         btnCregistrar.setEnabled(true);
         btnCactualizar.setEnabled(false);
         btnCeliminar.setEnabled(false);
+        limpiarRegistrosClientes();
     }//GEN-LAST:event_btnCmostrarActionPerformed
 
     private void btnCregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCregistrarActionPerformed
-        try {
-            String nombres = txtCnombres.getText();
-            String apellidos = txtCapellidos.getText();
-            String dni = txtCdni.getText();
+        if (txtCdni.getText().length() == 8) {
+            try {
+                String nombres = txtCnombres.getText();
+                String apellidos = txtCapellidos.getText();
+                String dni = txtCdni.getText();
 
-            if (rbtCnatural.isSelected()) {
-                clienteJDBC.insert(new Cliente("Natural", nombres, apellidos, dni, "", ""));
-            }
+                if (rbtCnatural.isSelected()) {
+                    clienteJDBC.insert(new Cliente("Natural", nombres, apellidos, dni, "", ""));
+                    if (clienteJDBC.getError()) {
+                        JOptionPane.showMessageDialog(this, "El DNI ya se encontraba registrado");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Cliente Registrado");
+                        limpiarRegistrosClientes();
+                    }
+                }
 
-            if (rbtCjuridico.isSelected()) {
-                String ruc = txtCruc.getText();
-                String razon = txtCrazon.getText();
-                clienteJDBC.insert(new Cliente("Jurídica", nombres, apellidos, dni, ruc, razon));
+                if (rbtCjuridico.isSelected()) {
+                    if (txtCruc.getText().length() == 11) {
+                        String ruc = txtCruc.getText();
+                        String razon = txtCrazon.getText();
+                        clienteJDBC.insert(new Cliente("Jurídica", nombres, apellidos, dni, ruc, razon));
+                        if (clienteJDBC.getError()) {
+                            JOptionPane.showMessageDialog(this, "El DNI ya se encontraba registrado");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Cliente Registrado");
+                            limpiarRegistrosClientes();
+                        }
+                    } else {
+                        txtCruc.setText("");
+                        JOptionPane.showMessageDialog(this, "RUC no válido");
+                    }
+                }
+            } catch (HeadlessException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
             }
-            JOptionPane.showMessageDialog(this, "Cliente Registrado");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        } else {
+            txtCdni.setText("");
+            JOptionPane.showMessageDialog(this, "DNI no válido");
         }
 
     }//GEN-LAST:event_btnCregistrarActionPerformed
 
     private void btnCactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCactualizarActionPerformed
-        try {
-            String nombres = txtCnombres.getText();
-            String apellidos = txtCapellidos.getText();
-            String dni = txtCdni.getText();
+        if (txtCdni.getText().length() == 8) {
+            try {
+                String nombres = txtCnombres.getText();
+                String apellidos = txtCapellidos.getText();
+                String dni = txtCdni.getText();
 
-            if (rbtCnatural.isSelected()) {
-                clienteJDBC.update(new Cliente(idCliente, "Natural", nombres, apellidos, dni, "", ""));
-            }
+                if (rbtCnatural.isSelected()) {
+                    clienteJDBC.update(new Cliente(idCliente, "Natural", nombres, apellidos, dni, "", ""));
+                    if (clienteJDBC.getError()) {
+                        JOptionPane.showMessageDialog(this, "El DNI ya se encontraba registrado");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Cliente Registrado");
+                        limpiarRegistrosClientes();
+                    }
+                }
 
-            if (rbtCjuridico.isSelected()) {
-                String ruc = txtCruc.getText();
-                String razon = txtCrazon.getText();
-                clienteJDBC.update(new Cliente(idCliente, "Jurídica", nombres, apellidos, dni, ruc, razon));
+                if (rbtCjuridico.isSelected()) {
+                    if (txtCruc.getText().length() == 11) {
+                        String ruc = txtCruc.getText();
+                        String razon = txtCrazon.getText();
+                        clienteJDBC.update(new Cliente(idCliente, "Jurídica", nombres, apellidos, dni, ruc, razon));
+                        if (clienteJDBC.getError()) {
+                            JOptionPane.showMessageDialog(this, "El DNI ya se encontraba registrado");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Cliente Registrado");
+                            limpiarRegistrosClientes();
+                        }
+                    } else {
+                        txtCruc.setText("");
+                        JOptionPane.showMessageDialog(this, "RUC no válido");
+                    }
+                }
+            } catch (HeadlessException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
             }
-            JOptionPane.showMessageDialog(this, "Cliente Actualizado");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        } else {
+            txtCdni.setText("");
+            JOptionPane.showMessageDialog(this, "DNI no válido");
         }
 
     }//GEN-LAST:event_btnCactualizarActionPerformed
 
     private void btnCeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCeliminarActionPerformed
         clienteJDBC.delete(new Cliente(idCliente));
+        limpiarRegistrosClientes();
         JOptionPane.showMessageDialog(this, "Cliente Eliminado");
     }//GEN-LAST:event_btnCeliminarActionPerformed
 
@@ -2485,6 +2534,7 @@ public class Plataforma extends javax.swing.JFrame {
 
     private void sec02MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseClicked
         paneles.setSelectedIndex(1);
+        detalles = new ArrayList<>();
     }//GEN-LAST:event_sec02MouseClicked
 
     private void sec03MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseClicked
@@ -2531,24 +2581,85 @@ public class Plataforma extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCnombresFocusLost
 
     private void tblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUsuariosMouseClicked
-        // TODO add your handling code here:
+        try {
+            int x = tblUsuarios.getSelectedRow();
+
+            idUsuario = usuarios.get(x).getIdUsuario();
+            txtUuser.setText(usuarios.get(x).getUser());
+            txtUpass.setText(password.desencriptar(usuarios.get(x).getPassword()));
+            txtUempleado.setText("" + usuarios.get(x).getEmpleado().getidEmpleado());
+            btnUregistrar.setEnabled(false);
+            btnUactualizar.setEnabled(true);
+            btnUeliminar.setEnabled(true);
+            btnSelecEmpleado.setEnabled(false);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Dar solo click izquierdo.");
+        }
     }//GEN-LAST:event_tblUsuariosMouseClicked
 
     private void btnUmostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUmostrarActionPerformed
-        usuarioJDBC.select(empleados);
+        usuarios = usuarioJDBC.select(empleados);
         actualizarTablaUsuario();
+
+        btnUregistrar.setEnabled(true);
+        btnSelecEmpleado.setEnabled(true);
+        btnUactualizar.setEnabled(false);
+        btnUeliminar.setEnabled(false);
     }//GEN-LAST:event_btnUmostrarActionPerformed
 
     private void btnUregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUregistrarActionPerformed
+        try {
+            int idEmple = Integer.parseInt(txtUempleado.getText());
+            String user = txtUuser.getText();
+            String pass = password.encriptar(String.valueOf(txtUpass.getPassword()));
 
+            int posEmp = 0;
+            for (int i = 0; i < empleados.size(); i++) {
+                if (empleados.get(i).getidEmpleado() == idEmple) {
+                    posEmp = i;
+                    break;
+                }
+            }
+
+            usuarioJDBC.insert(new Usuario(empleados.get(posEmp), user, pass));
+
+            limpiarRegistrosUsuarios();
+
+            if (usuarioJDBC.getError()) {
+                JOptionPane.showMessageDialog(this, "El Usuario y/o Empleado ya se encuentra en uso");
+            } else {
+                JOptionPane.showMessageDialog(this, "Usuario Registrado");
+            }
+
+        } catch (HeadlessException | NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        }
     }//GEN-LAST:event_btnUregistrarActionPerformed
 
     private void btnUactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUactualizarActionPerformed
-        // TODO add your handling code here:
+        try {
+            String user = txtUuser.getText();
+            String pass = password.encriptar(String.valueOf(txtUpass.getPassword()));
+
+            usuarioJDBC.update(new Usuario(idUsuario, user, pass));
+
+            limpiarRegistrosUsuarios();
+
+            if (usuarioJDBC.getError()) {
+                JOptionPane.showMessageDialog(this, "El Usuario y/o Empleado ya se encuentra en uso");
+            } else {
+                JOptionPane.showMessageDialog(this, "Usuario Actualizado");
+            }
+
+        } catch (HeadlessException | NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Llenar todos los campos y/o error en la entrada de datos");
+        }
     }//GEN-LAST:event_btnUactualizarActionPerformed
 
     private void btnUeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUeliminarActionPerformed
-        // TODO add your handling code here:
+        usuarioJDBC.delete(new Usuario(idUsuario));
+        limpiarRegistrosUsuarios();
+        JOptionPane.showMessageDialog(this, "Usuario Eliminado");
     }//GEN-LAST:event_btnUeliminarActionPerformed
 
     private void btnSelecEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecEmpleadoActionPerformed
@@ -2565,6 +2676,10 @@ public class Plataforma extends javax.swing.JFrame {
         jDialogEmpleado.dispose();
     }//GEN-LAST:event_tblEmpleadoDialogMouseClicked
 
+    private void txtVcantidadKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtVcantidadKeyTyped
+        validarSoloNumeros(evt);
+    }//GEN-LAST:event_txtVcantidadKeyTyped
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -2579,13 +2694,17 @@ public class Plataforma extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Plataforma.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Plataforma.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Plataforma.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Plataforma.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -2659,6 +2778,12 @@ public class Plataforma extends javax.swing.JFrame {
         txtCruc.setText("");
     }
 
+    private void limpiarRegistrosUsuarios() {
+        txtUuser.setText("");
+        txtUpass.setText("");
+        txtUempleado.setText("");
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarCarrito;
     private javax.swing.JButton btnCactualizar;
@@ -2725,7 +2850,6 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
-    private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
@@ -2755,7 +2879,6 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator21;
     private javax.swing.JSeparator jSeparator22;
-    private javax.swing.JSeparator jSeparator23;
     private javax.swing.JSeparator jSeparator24;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
@@ -2813,8 +2936,7 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JTextField txtPstock;
     private javax.swing.JLabel txtRolActivo;
     private javax.swing.JTextField txtUempleado;
-    private javax.swing.JTextField txtUpass;
-    private javax.swing.JTextField txtUrepass;
+    private javax.swing.JPasswordField txtUpass;
     private javax.swing.JLabel txtUsuarioActivo;
     private javax.swing.JTextField txtUuser;
     private javax.swing.JTextField txtVcantidad;

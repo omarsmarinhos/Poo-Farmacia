@@ -7,7 +7,8 @@ public class Usuario {
     private String user;
     private String password;
 
-    public Usuario() {
+    public Usuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public Usuario(Empleado empleado, String user, String password) {
@@ -19,6 +20,12 @@ public class Usuario {
     public Usuario(int idUsuario, Empleado empleado, String user, String password) {
         this.idUsuario = idUsuario;
         this.empleado = empleado;
+        this.user = user;
+        this.password = password;
+    }
+
+    public Usuario(int idUsuario, String user, String password) {
+        this.idUsuario = idUsuario;
         this.user = user;
         this.password = password;
     }

@@ -1,6 +1,7 @@
 package conexion;
 
 import clases.Cliente;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +22,8 @@ public class ClienteJDBC implements ClienteDAO{
     private Connection connection;
     private PreparedStatement preparedStatement;
     private Statement statement;
+    
+    private boolean error = false;
     
     @Override
     public ArrayList<Cliente> select(){
@@ -68,6 +71,8 @@ public class ClienteJDBC implements ClienteDAO{
             connection.close();
             System.out.println("Cliente-agregado");
             
+        } catch (MySQLIntegrityConstraintViolationException e) {
+            error = true;
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
@@ -90,6 +95,8 @@ public class ClienteJDBC implements ClienteDAO{
             System.out.println("Cliente-actualizado");
             preparedStatement.close();
             connection.close();
+        }catch (MySQLIntegrityConstraintViolationException e) {
+            error = true;
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         } 
@@ -109,6 +116,12 @@ public class ClienteJDBC implements ClienteDAO{
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         } 
+    }
+    
+    public boolean getError(){
+        boolean aux = error;
+        error = false;
+        return aux;
     }
     
 }

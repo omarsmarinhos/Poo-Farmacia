@@ -1,7 +1,9 @@
 package ventanas;
 
+import clases.Pass;
 import conexion.Conexion;
 import java.awt.Color;
+import java.awt.HeadlessException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,27 +13,15 @@ import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JFrame {
 
+    Pass pass = new Pass();
+    
     public Login() {
         initComponents();
         System.out.println("User: admin");
         System.out.println("Pass: omar");
     }
 
-    String MD5(String md5) {
-        try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(md5.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < array.length; i++) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("error");
-        }
-        return null;
-    }
-
+ 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -221,7 +211,7 @@ public class Login extends javax.swing.JFrame {
 
     private void btnIngresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIngresarMouseClicked
         String user = txtUser.getText();
-        String pass = String.valueOf(txtPassword.getPassword());
+        String password = String.valueOf(txtPassword.getPassword());
         try {
             Connection con = Conexion.getConexion();
             Statement sql = con.createStatement();
@@ -232,7 +222,7 @@ public class Login extends javax.swing.JFrame {
                 int id_empleado = rs.getInt("id_empleado");
                 System.out.println("" + id_empleado);
                 String passDB = rs.getString("password");
-                if (passDB.equals(MD5(pass))) {
+                if (passDB.equals(pass.encriptar(password))) {
                     
                     System.out.println("Usuario-obtenido");
                     Plataforma p = new Plataforma(id_empleado);
@@ -248,7 +238,7 @@ public class Login extends javax.swing.JFrame {
             con.close();
         } catch (SQLException ex) {
             System.out.println("Error-Usuario" + ex.toString());
-        } catch (Exception ex){
+        } catch (HeadlessException ex){
             JOptionPane.showMessageDialog(this, "Usuario no existe");
         }
     }//GEN-LAST:event_btnIngresarMouseClicked
