@@ -13,20 +13,18 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Reporte {
 
     public static int COMPROBANTE = 1;
     private Document doc;
     private String archivo;
+    private String fecha;
 
     public Reporte(int tipoReporte) {
         if (tipoReporte == 1) {
@@ -37,7 +35,9 @@ public class Reporte {
 
     public void crearReporte(ArrayList<Venta> ventas, int ventaSeleccionada) {
         ArrayList<DetalleVenta> detalles = ventas.get(ventaSeleccionada).getDetalles();
-        archivo = "venta-" + ventas.get(ventaSeleccionada).getIdVenta() + ".pdf";
+        fecha = ventas.get(ventaSeleccionada).getFecha();
+        fecha = fecha.substring(0,fecha.length() - 9);
+        archivo = "comprobantes/venta-" + ventas.get(ventaSeleccionada).getIdVenta() + "-" + fecha +  ".pdf";
         try {
             FileOutputStream ficheroPDF = new FileOutputStream(archivo);
             PdfWriter.getInstance(doc, ficheroPDF);

@@ -48,6 +48,7 @@ public class VentaJDBC implements VentaDAO {
             }
             sqlVenta.close();
             rsVenta.close();
+            Conexion.getConexion().close();
             System.out.println("ventas-obtenidass");
         } catch (SQLException ex) {
             System.out.println("mostrar-ventas" + ex.toString());
@@ -89,6 +90,7 @@ public class VentaJDBC implements VentaDAO {
             }
             sqlVenta.close();
             rsVenta.close();
+            Conexion.getConexion().close();
             System.out.println("ventas-obtenidass");
         } catch (SQLException ex) {
             System.out.println("mostrar-ventas" + ex.toString());
@@ -132,6 +134,7 @@ public class VentaJDBC implements VentaDAO {
             }
             sqlVenta.close();
             rsVenta.close();
+            Conexion.getConexion().close();
             System.out.println("ventas-obtenidass");
         } catch (SQLException ex) {
             System.out.println("mostrar-ventas" + ex.toString());
@@ -175,6 +178,7 @@ public class VentaJDBC implements VentaDAO {
             }
             sqlVenta.close();
             rsVenta.close();
+            Conexion.getConexion().close();
             System.out.println("ventas-obtenidass");
         } catch (SQLException ex) {
             System.out.println("mostrar-ventas" + ex.toString());
@@ -193,6 +197,8 @@ public class VentaJDBC implements VentaDAO {
             sql.setString(4, venta.getMetodoPago());
             sql.executeUpdate();
             sql.close();
+            Conexion.getConexion().close();
+            
             System.out.println("venta creada");
         } catch (SQLException ex) {
             System.out.println("Error-registrarVenta" + ex.toString());
@@ -207,6 +213,7 @@ public class VentaJDBC implements VentaDAO {
                 sql.setFloat(3, detalle.getImporte());
                 sql.executeUpdate();
                 sql.close();
+                Conexion.getConexion().close();
             }
             System.out.println("detalle de venta agregado");
         } catch (SQLException ex) {

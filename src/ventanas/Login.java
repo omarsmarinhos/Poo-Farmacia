@@ -4,7 +4,6 @@ import clases.Pass;
 import conexion.Conexion;
 import java.awt.Color;
 import java.awt.HeadlessException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -225,7 +224,7 @@ public class Login extends javax.swing.JFrame {
                 if (passDB.equals(pass.encriptar(password))) {
                     
                     System.out.println("Usuario-obtenido");
-                    Plataforma p = new Plataforma(id_empleado);
+                    PlataformaAdmin p = new PlataformaAdmin(id_empleado);
                     p.setVisible(true);
                     this.dispose();
                 } else {

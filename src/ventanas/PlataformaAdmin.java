@@ -14,8 +14,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import report.GenerarReporteExcel;
 
-public class Plataforma extends javax.swing.JFrame {
+public class PlataformaAdmin extends javax.swing.JFrame {
 
     ProductoJDBC productoJDBC = new ProductoJDBC();
     EmpleadoJDBC empleadoJDBC = new EmpleadoJDBC();
@@ -52,8 +53,9 @@ public class Plataforma extends javax.swing.JFrame {
     Color colorSalir = new Color(45, 156, 35);
 
     Pass password = new Pass();
+    GenerarReporteExcel rpteExcel = new GenerarReporteExcel();
 
-    public Plataforma(int id_empleado) {
+    public PlataformaAdmin(int id_empleado) {
         //Trea las tablas de la base de datos
         empleados = empleadoJDBC.select();
         clientes = clienteJDBC.select();
@@ -341,6 +343,10 @@ public class Plataforma extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         tblVentas = new javax.swing.JTable();
         btnVactualizar = new javax.swing.JButton();
+        btnVfiltrarXdia = new javax.swing.JButton();
+        btnVfiltrarXSemana = new javax.swing.JButton();
+        btnVfiltrarXquincena = new javax.swing.JButton();
+        btnVfiltrarXmes = new javax.swing.JButton();
         panelReportes = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         tblVentasReporte = new javax.swing.JTable();
@@ -1274,6 +1280,78 @@ public class Plataforma extends javax.swing.JFrame {
         });
         panelVentas.add(btnVactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 440, 180, 40));
 
+        btnVfiltrarXdia.setBackground(new java.awt.Color(34, 73, 24));
+        btnVfiltrarXdia.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnVfiltrarXdia.setForeground(new java.awt.Color(255, 255, 255));
+        btnVfiltrarXdia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
+        btnVfiltrarXdia.setText("Filtrar por día");
+        btnVfiltrarXdia.setToolTipText("");
+        btnVfiltrarXdia.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnVfiltrarXdia.setBorderPainted(false);
+        btnVfiltrarXdia.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVfiltrarXdia.setFocusPainted(false);
+        btnVfiltrarXdia.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        btnVfiltrarXdia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVfiltrarXdiaActionPerformed(evt);
+            }
+        });
+        panelVentas.add(btnVfiltrarXdia, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, 210, 40));
+
+        btnVfiltrarXSemana.setBackground(new java.awt.Color(34, 73, 24));
+        btnVfiltrarXSemana.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnVfiltrarXSemana.setForeground(new java.awt.Color(255, 255, 255));
+        btnVfiltrarXSemana.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
+        btnVfiltrarXSemana.setText("Filtrar por semana");
+        btnVfiltrarXSemana.setToolTipText("");
+        btnVfiltrarXSemana.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnVfiltrarXSemana.setBorderPainted(false);
+        btnVfiltrarXSemana.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVfiltrarXSemana.setFocusPainted(false);
+        btnVfiltrarXSemana.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        btnVfiltrarXSemana.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVfiltrarXSemanaActionPerformed(evt);
+            }
+        });
+        panelVentas.add(btnVfiltrarXSemana, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 440, 200, 40));
+
+        btnVfiltrarXquincena.setBackground(new java.awt.Color(34, 73, 24));
+        btnVfiltrarXquincena.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnVfiltrarXquincena.setForeground(new java.awt.Color(255, 255, 255));
+        btnVfiltrarXquincena.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
+        btnVfiltrarXquincena.setText("Filtrar por quincena");
+        btnVfiltrarXquincena.setToolTipText("");
+        btnVfiltrarXquincena.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnVfiltrarXquincena.setBorderPainted(false);
+        btnVfiltrarXquincena.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVfiltrarXquincena.setFocusPainted(false);
+        btnVfiltrarXquincena.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        btnVfiltrarXquincena.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVfiltrarXquincenaActionPerformed(evt);
+            }
+        });
+        panelVentas.add(btnVfiltrarXquincena, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 510, 210, 40));
+
+        btnVfiltrarXmes.setBackground(new java.awt.Color(34, 73, 24));
+        btnVfiltrarXmes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnVfiltrarXmes.setForeground(new java.awt.Color(255, 255, 255));
+        btnVfiltrarXmes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
+        btnVfiltrarXmes.setText("Filtrar por mes");
+        btnVfiltrarXmes.setToolTipText("");
+        btnVfiltrarXmes.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnVfiltrarXmes.setBorderPainted(false);
+        btnVfiltrarXmes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVfiltrarXmes.setFocusPainted(false);
+        btnVfiltrarXmes.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        btnVfiltrarXmes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVfiltrarXmesActionPerformed(evt);
+            }
+        });
+        panelVentas.add(btnVfiltrarXmes, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 510, 200, 40));
+
         paneles.addTab("COMPRABANTES", panelVentas);
 
         panelReportes.setBackground(new java.awt.Color(255, 255, 255));
@@ -1317,7 +1395,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        panelReportes.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 470, -1, -1));
+        panelReportes.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 560, -1, -1));
 
         jButton3.setText("Generar reporte de Dia");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -1325,7 +1403,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
-        panelReportes.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 470, -1, -1));
+        panelReportes.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 480, -1, -1));
 
         jButton4.setText("Generar reporte de Semana");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -1333,7 +1411,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
-        panelReportes.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 470, -1, -1));
+        panelReportes.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 440, -1, -1));
 
         jButton5.setText("Generar reporte de Mes");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -1341,7 +1419,7 @@ public class Plataforma extends javax.swing.JFrame {
                 jButton5ActionPerformed(evt);
             }
         });
-        panelReportes.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 470, -1, -1));
+        panelReportes.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 520, -1, -1));
 
         btnRactualizar.setBackground(new java.awt.Color(34, 73, 24));
         btnRactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1358,13 +1436,13 @@ public class Plataforma extends javax.swing.JFrame {
                 btnRactualizarActionPerformed(evt);
             }
         });
-        panelReportes.add(btnRactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, 180, 40));
+        panelReportes.add(btnRactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 470, 180, 40));
 
         btnRcrearComprobante.setBackground(new java.awt.Color(34, 73, 24));
         btnRcrearComprobante.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnRcrearComprobante.setForeground(new java.awt.Color(255, 255, 255));
         btnRcrearComprobante.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-refresh-2-32.png"))); // NOI18N
-        btnRcrearComprobante.setText("Generar reporte");
+        btnRcrearComprobante.setText("Generar comprobante");
         btnRcrearComprobante.setToolTipText("");
         btnRcrearComprobante.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
         btnRcrearComprobante.setBorderPainted(false);
@@ -1376,7 +1454,7 @@ public class Plataforma extends javax.swing.JFrame {
                 btnRcrearComprobanteActionPerformed(evt);
             }
         });
-        panelReportes.add(btnRcrearComprobante, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 520, 180, 40));
+        panelReportes.add(btnRcrearComprobante, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 470, 240, 40));
 
         paneles.addTab("REPORTES", panelReportes);
 
@@ -2502,31 +2580,40 @@ public class Plataforma extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
         ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
+        
+        String nombreArchivo = "dia";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
 
-        actualizarTablaVenta();
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
-        actualizarTablaVenta();
+        String nombreArchivo = "semana";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void btnRactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRactualizarActionPerformed
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
         ventas = ventaJDBC.select(empleados, clientes, productos);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnRactualizarActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
-        actualizarTablaVenta();
+        String nombreArchivo = "quincena";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
-        actualizarTablaVenta();
+        ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
+        String nombreArchivo = "mes";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void sec01MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseClicked
@@ -2682,6 +2769,31 @@ public class Plataforma extends javax.swing.JFrame {
         validarSoloNumeros(evt);
     }//GEN-LAST:event_txtVcantidadKeyTyped
 
+    private void btnVfiltrarXdiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXdiaActionPerformed
+        String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
+
+        actualizarTablaVenta();
+        
+    }//GEN-LAST:event_btnVfiltrarXdiaActionPerformed
+
+    private void btnVfiltrarXSemanaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXSemanaActionPerformed
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
+        actualizarTablaVenta();
+        
+    }//GEN-LAST:event_btnVfiltrarXSemanaActionPerformed
+
+    private void btnVfiltrarXquincenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXquincenaActionPerformed
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
+        actualizarTablaVenta();
+        
+    }//GEN-LAST:event_btnVfiltrarXquincenaActionPerformed
+
+    private void btnVfiltrarXmesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXmesActionPerformed
+        ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
+        actualizarTablaVenta();
+    }//GEN-LAST:event_btnVfiltrarXmesActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -2696,24 +2808,25 @@ public class Plataforma extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class
+            java.util.logging.Logger.getLogger(PlataformaAdmin.class
                     .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class
+            java.util.logging.Logger.getLogger(PlataformaAdmin.class
                     .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class
+            java.util.logging.Logger.getLogger(PlataformaAdmin.class
                     .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Plataforma.class
+            java.util.logging.Logger.getLogger(PlataformaAdmin.class
                     .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Plataforma(0).setVisible(true);
+                new PlataformaAdmin(0).setVisible(true);
             }
         });
     }
@@ -2813,6 +2926,10 @@ public class Plataforma extends javax.swing.JFrame {
     private javax.swing.JButton btnUmostrar;
     private javax.swing.JButton btnUregistrar;
     private javax.swing.JButton btnVactualizar;
+    private javax.swing.JButton btnVfiltrarXSemana;
+    private javax.swing.JButton btnVfiltrarXdia;
+    private javax.swing.JButton btnVfiltrarXmes;
+    private javax.swing.JButton btnVfiltrarXquincena;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel cabecera;
     private javax.swing.JComboBox<String> cmbEtipoEmpleado;
