@@ -1,6 +1,6 @@
-package conexion;
+package clases;
 
-import clases.Cliente;
+import conexion.Conexion;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,9 +1,8 @@
-package conexion;
+package clases;
 
-import clases.Producto;
+import conexion.Conexion;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ProductoJDBC implements ProductoDao{
 

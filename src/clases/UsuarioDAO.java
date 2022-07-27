@@ -1,7 +1,5 @@
-package conexion;
+package clases;
 
-import clases.Empleado;
-import clases.Usuario;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;

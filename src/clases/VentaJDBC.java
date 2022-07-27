@@ -1,10 +1,6 @@
-package conexion;
+package clases;
 
-import clases.Cliente;
-import clases.DetalleVenta;
-import clases.Empleado;
-import clases.Producto;
-import clases.Venta;
+import conexion.Conexion;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

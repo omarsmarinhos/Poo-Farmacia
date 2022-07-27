@@ -1,9 +1,5 @@
-package conexion;
+package clases;
 
-import clases.Cliente;
-import clases.Empleado;
-import clases.Producto;
-import clases.Venta;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,5 @@
-package conexion;
+package clases;
 
-import clases.Cliente;
 import java.sql.SQLException;
 import java.util.List;
 
