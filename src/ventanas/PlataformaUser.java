@@ -21,7 +21,7 @@ public class PlataformaUser extends javax.swing.JFrame {
     ProductoJDBC productoJDBC = new ProductoJDBC();
     EmpleadoJDBC empleadoJDBC = new EmpleadoJDBC();
     ClienteJDBC clienteJDBC = new ClienteJDBC();
-    VentaJDBC ventaJDBC = new VentaJDBC();
+    VentaEmpleadoJDBC ventaJDBC = new VentaEmpleadoJDBC();
     UsuarioJDBC usuarioJDBC = new UsuarioJDBC();
 
     DefaultTableModel modeloProdcutos = new DefaultTableModel();
@@ -48,6 +48,7 @@ public class PlataformaUser extends javax.swing.JFrame {
 
     //id usuario activo
     int idEmpleadoActual;
+    int posEmpleado;
 
     Color colorEntrar = new Color(34, 117, 26);
     Color colorSalir = new Color(45, 156, 35);
@@ -83,8 +84,6 @@ public class PlataformaUser extends javax.swing.JFrame {
     //Carga los datos del usuario activo
     private void actualizarEmpleadoActual(int id_empleado) {
         idEmpleadoActual = id_empleado;
-
-        int posEmpleado = 0;
         for (int i = 0; i < empleados.size(); i++) {
             if (empleados.get(i).getidEmpleado() == id_empleado) {
                 posEmpleado = i;
@@ -1362,7 +1361,7 @@ public class PlataformaUser extends javax.swing.JFrame {
 
                 String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
 
-                ventaJDBC.insert(new Venta(empleados.get(idEmpleadoActual),
+                ventaJDBC.insert(new Venta(empleados.get(posEmpleado),
                         clientes.get(posCli), detalles, metodoPago));
 
                 detalles = new ArrayList<>();
@@ -1528,7 +1527,7 @@ public class PlataformaUser extends javax.swing.JFrame {
     }//GEN-LAST:event_tblProductosDialogMouseClicked
 
     private void btnVactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVactualizarActionPerformed
-        ventas = ventaJDBC.select(empleados, clientes, productos);
+        ventas = ventaJDBC.select(empleados, clientes, productos, idEmpleadoActual);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnVactualizarActionPerformed
 
@@ -1626,26 +1625,26 @@ public class PlataformaUser extends javax.swing.JFrame {
 
     private void btnVfiltrarXdiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXdiaActionPerformed
         String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
+        ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy, idEmpleadoActual);
 
         actualizarTablaVenta();
 
     }//GEN-LAST:event_btnVfiltrarXdiaActionPerformed
 
     private void btnVfiltrarXSemanaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXSemanaActionPerformed
-        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7, idEmpleadoActual);
         actualizarTablaVenta();
 
     }//GEN-LAST:event_btnVfiltrarXSemanaActionPerformed
 
     private void btnVfiltrarXquincenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXquincenaActionPerformed
-        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15, idEmpleadoActual);
         actualizarTablaVenta();
 
     }//GEN-LAST:event_btnVfiltrarXquincenaActionPerformed
 
     private void btnVfiltrarXmesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXmesActionPerformed
-        ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
+        ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos, idEmpleadoActual);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnVfiltrarXmesActionPerformed
 
@@ -1673,7 +1672,7 @@ public class PlataformaUser extends javax.swing.JFrame {
     private void btnBuscarIdClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarIdClienteActionPerformed
         String buscar = txtBuscarIdCliente.getText();
 
-        ventas = ventaJDBC.search(empleados, clientes, productos, buscar);
+        ventas = ventaJDBC.search(empleados, clientes, productos, buscar, idEmpleadoActual);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnBuscarIdClienteActionPerformed
 
@@ -1697,8 +1696,8 @@ public class PlataformaUser extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRcrearComprobanteActionPerformed
 
     private void btnRactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRactualizarActionPerformed
-        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
-        ventas = ventaJDBC.select(empleados, clientes, productos);
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15, idEmpleadoActual);
+        ventas = ventaJDBC.select(empleados, clientes, productos, idEmpleadoActual);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnRactualizarActionPerformed
 

@@ -47,7 +47,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     int idVenta;
 
     //id usuario activo
-    int idEmpleadoActual;
+    int posEmpleado;
 
     Color colorEntrar = new Color(34, 117, 26);
     Color colorSalir = new Color(45, 156, 35);
@@ -96,9 +96,6 @@ public class PlataformaAdmin extends javax.swing.JFrame {
 
     //Carga los datos del usuario activo
     private void actualizarEmpleadoActual(int id_empleado) {
-        idEmpleadoActual = id_empleado;
-
-        int posEmpleado = 0;
         for (int i = 0; i < empleados.size(); i++) {
             if (empleados.get(i).getidEmpleado() == id_empleado) {
                 posEmpleado = i;
@@ -2121,7 +2118,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
 
                 String metodoPago = (String) cmbVmetodoPago.getSelectedItem();
 
-                ventaJDBC.insert(new Venta(empleados.get(idEmpleadoActual),
+                ventaJDBC.insert(new Venta(empleados.get(posEmpleado),
                         clientes.get(posCli), detalles, metodoPago));
 
                 detalles = new ArrayList<>();
