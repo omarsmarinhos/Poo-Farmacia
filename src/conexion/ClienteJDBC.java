@@ -118,6 +118,34 @@ public class ClienteJDBC implements ClienteDAO{
         } 
     }
     
+    @Override
+    public ArrayList<Cliente> search(String string){
+        ArrayList<Cliente> clientes = new ArrayList<>();
+        try {
+            connection = Conexion.getConexion();
+            statement = connection.createStatement();
+            String query = "SELECT * FROM cliente WHERE dni LIKE '" + string + "%'";
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                clientes.add(new Cliente(
+                rs.getInt("id_cliente"),
+                rs.getString("tipo_persona"),
+                rs.getString("nombres"),
+                rs.getString("apellidos"),
+                rs.getString("dni"),
+                rs.getString("ruc"),
+                rs.getString("razon_social")));
+            }
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("Producto-buscado");
+        } catch (SQLException ex) {
+            System.out.println("Error-buscarProdcuto" + ex.toString());
+        }
+        return clientes;
+    }
+    
     public boolean getError(){
         boolean aux = error;
         error = false;

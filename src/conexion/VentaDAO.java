@@ -14,7 +14,5 @@ public interface VentaDAO {
     
     public void insert(Venta venta) throws SQLException;
     
-    public void update(Venta venta) throws SQLException;
-    
-    public void delete(Venta venta) throws SQLException;
+    public List<Venta> search(ArrayList<Empleado> empleados, ArrayList<Cliente> clientes, ArrayList<Producto> productos, String buscar) throws SQLException;
 }

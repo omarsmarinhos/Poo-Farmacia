@@ -55,7 +55,7 @@ public class VentaJDBC implements VentaDAO {
         }
         return ventas;
     }
-    
+
     public ArrayList<Venta> selectVentaDia(ArrayList<Empleado> empleados, ArrayList<Cliente> clientes, ArrayList<Producto> productos, String dia) {
         ArrayList<Venta> ventas = new ArrayList<>();
         try {
@@ -97,13 +97,13 @@ public class VentaJDBC implements VentaDAO {
         }
         return ventas;
     }
-    
+
     public ArrayList<Venta> selectVentaPorDias(ArrayList<Empleado> empleados, ArrayList<Cliente> clientes, ArrayList<Producto> productos, int dias) {
         ArrayList<Venta> ventas = new ArrayList<>();
         try {
             Statement sqlVenta = Conexion.getConexion().createStatement();
-            String queryVenta = 
-                    "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL "+ dias + " DAY)"
+            String queryVenta
+                    = "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL " + dias + " DAY)"
                     + " AND DATE_ADD(CURRENT_DATE(),INTERVAL 1 DAY)";
             ResultSet rsVenta = sqlVenta.executeQuery(queryVenta);
 
@@ -141,13 +141,13 @@ public class VentaJDBC implements VentaDAO {
         }
         return ventas;
     }
-    
+
     public ArrayList<Venta> selectVentaUltimoMes(ArrayList<Empleado> empleados, ArrayList<Cliente> clientes, ArrayList<Producto> productos) {
         ArrayList<Venta> ventas = new ArrayList<>();
         try {
             Statement sqlVenta = Conexion.getConexion().createStatement();
-            String queryVenta = 
-                    "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 1 MONTH)"
+            String queryVenta
+                    = "SELECT * FROM ventas WHERE fecha BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 1 MONTH)"
                     + " AND DATE_ADD(CURRENT_DATE(),INTERVAL 1 DAY)";
             ResultSet rsVenta = sqlVenta.executeQuery(queryVenta);
 
@@ -198,7 +198,7 @@ public class VentaJDBC implements VentaDAO {
             sql.executeUpdate();
             sql.close();
             Conexion.getConexion().close();
-            
+
             System.out.println("venta creada");
         } catch (SQLException ex) {
             System.out.println("Error-registrarVenta" + ex.toString());
@@ -222,13 +222,46 @@ public class VentaJDBC implements VentaDAO {
     }
 
     @Override
-    public void update(Venta venta) throws SQLException {
+    public ArrayList<Venta> search(ArrayList<Empleado> empleados, ArrayList<Cliente> clientes, ArrayList<Producto> productos, String buscar) {
+        ArrayList<Venta> ventas = new ArrayList<>();
+        try {
+            Statement sqlVenta = Conexion.getConexion().createStatement();
+            String queryVenta = "SELECT * FROM ventas WHERE id_cliente LIKE '" + buscar + "%'";
+            ResultSet rsVenta = sqlVenta.executeQuery(queryVenta);
 
-    }
+            while (rsVenta.next()) {
+                int idVenta = rsVenta.getInt("id_venta");
+                int idEmpleado = getIdEmpleado(empleados, rsVenta.getInt("id_empleado"));
+                int idCliente = getIdCliente(clientes, rsVenta.getInt("id_cliente"));
+                String metodoPago = rsVenta.getString("metodo_pago");
+                String fecha = rsVenta.getString("fecha");
 
-    @Override
-    public void delete(Venta venta) throws SQLException {
+                Statement sqlDetail = Conexion.getConexion().createStatement();
+                String queryDetail = "SELECT id_producto, cantidad "
+                        + "FROM detalles WHERE id_venta = " + idVenta;
+                ResultSet rsDetail = sqlDetail.executeQuery(queryDetail);
 
+                ArrayList<DetalleVenta> detalles = new ArrayList<>();
+                while (rsDetail.next()) {
+                    int idProducto = getIdProducto(productos, rsDetail.getInt("id_producto"));
+                    int cantidad = rsDetail.getInt("cantidad");
+
+                    detalles.add(new DetalleVenta(productos.get(idProducto), cantidad));
+                }
+
+                ventas.add(new Venta(idVenta, empleados.get(idEmpleado),
+                        clientes.get(idCliente), detalles, metodoPago, fecha));
+                rsDetail.close();
+                sqlDetail.close();
+            }
+            sqlVenta.close();
+            rsVenta.close();
+            Conexion.getConexion().close();
+            System.out.println("ventas-obtenidass");
+        } catch (SQLException ex) {
+            System.out.println("mostrar-ventas" + ex.toString());
+        }
+        return ventas;
     }
 
     private int getIdProducto(ArrayList<Producto> productos, int idProducto) {

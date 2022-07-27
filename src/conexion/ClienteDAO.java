@@ -14,4 +14,6 @@ public interface ClienteDAO {
     
     public void delete(Cliente cliente) throws SQLException;
     
+    public List<Cliente> search(String buscar) throws SQLException;
+    
 }

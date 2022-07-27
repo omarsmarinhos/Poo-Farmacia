@@ -263,16 +263,28 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         jDialogClientes = new javax.swing.JDialog();
         jScrollPane6 = new javax.swing.JScrollPane();
         tblClientesDialog = new javax.swing.JTable();
+        jSeparator25 = new javax.swing.JSeparator();
+        txtBuscarCliente = new javax.swing.JTextField();
+        btnBuscarCliente = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jDialogproducto = new javax.swing.JDialog();
         jScrollPane7 = new javax.swing.JScrollPane();
         tblProductosDialog = new javax.swing.JTable();
+        jSeparator23 = new javax.swing.JSeparator();
+        txtBuscarProducto = new javax.swing.JTextField();
+        btnBuscarProducto = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
         jDialogDetalles = new javax.swing.JDialog();
         jScrollPane9 = new javax.swing.JScrollPane();
         tblDetallesDialog = new javax.swing.JTable();
         jDialogEmpleado = new javax.swing.JDialog();
+        jSeparator26 = new javax.swing.JSeparator();
+        jLabel12 = new javax.swing.JLabel();
         jScrollPane11 = new javax.swing.JScrollPane();
         tblEmpleadoDialog = new javax.swing.JTable();
+        txtBuscarEmpleado = new javax.swing.JTextField();
+        btnBuscarEmpleado = new javax.swing.JButton();
         btnSalir = new javax.swing.JLabel();
         panelInfoUsuario = new javax.swing.JPanel();
         foto = new javax.swing.JLabel();
@@ -347,15 +359,18 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         btnVfiltrarXSemana = new javax.swing.JButton();
         btnVfiltrarXquincena = new javax.swing.JButton();
         btnVfiltrarXmes = new javax.swing.JButton();
+        jSeparator27 = new javax.swing.JSeparator();
+        txtBuscarIdCliente = new javax.swing.JTextField();
+        btnBuscarIdCliente = new javax.swing.JButton();
+        jLabel13 = new javax.swing.JLabel();
         panelReportes = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         tblVentasReporte = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         btnRactualizar = new javax.swing.JButton();
         btnRcrearComprobante = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        cmbGenerarExcel = new javax.swing.JComboBox<>();
+        jButton6 = new javax.swing.JButton();
         panelEmpleados = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -428,6 +443,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         jDialogClientes.setModal(true);
         jDialogClientes.setResizable(false);
         jDialogClientes.setSize(new java.awt.Dimension(700, 350));
+        jDialogClientes.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jScrollPane6.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(32, 131, 42), 1, true));
 
@@ -458,28 +474,39 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         });
         jScrollPane6.setViewportView(tblClientesDialog);
 
-        javax.swing.GroupLayout jDialogClientesLayout = new javax.swing.GroupLayout(jDialogClientes.getContentPane());
-        jDialogClientes.getContentPane().setLayout(jDialogClientesLayout);
-        jDialogClientesLayout.setHorizontalGroup(
-            jDialogClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogClientesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jDialogClientesLayout.setVerticalGroup(
-            jDialogClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogClientesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jDialogClientes.getContentPane().add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 59, 690, 280));
+
+        jSeparator25.setForeground(new java.awt.Color(0, 0, 0));
+        jDialogClientes.getContentPane().add(jSeparator25, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 260, 10));
+
+        txtBuscarCliente.setBorder(null);
+        jDialogClientes.getContentPane().add(txtBuscarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, 260, 25));
+
+        btnBuscarCliente.setBackground(new java.awt.Color(34, 73, 24));
+        btnBuscarCliente.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnBuscarCliente.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscarCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnBuscarCliente.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnBuscarCliente.setBorderPainted(false);
+        btnBuscarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBuscarCliente.setFocusPainted(false);
+        btnBuscarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarClienteActionPerformed(evt);
+            }
+        });
+        jDialogClientes.getContentPane().add(btnBuscarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 10, 70, 40));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel9.setText("Buscar por DNI:");
+        jDialogClientes.getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 20, -1, -1));
 
         jDialogproducto.setTitle("Seleccionar un producto");
         jDialogproducto.setLocationByPlatform(true);
         jDialogproducto.setModal(true);
         jDialogproducto.setResizable(false);
         jDialogproducto.setSize(new java.awt.Dimension(700, 350));
+        jDialogproducto.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tblProductosDialog.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblProductosDialog.setModel(new javax.swing.table.DefaultTableModel(
@@ -507,22 +534,32 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         });
         jScrollPane7.setViewportView(tblProductosDialog);
 
-        javax.swing.GroupLayout jDialogproductoLayout = new javax.swing.GroupLayout(jDialogproducto.getContentPane());
-        jDialogproducto.getContentPane().setLayout(jDialogproductoLayout);
-        jDialogproductoLayout.setHorizontalGroup(
-            jDialogproductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogproductoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jDialogproductoLayout.setVerticalGroup(
-            jDialogproductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogproductoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jDialogproducto.getContentPane().add(jScrollPane7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 690, 260));
+
+        jSeparator23.setForeground(new java.awt.Color(0, 0, 0));
+        jDialogproducto.getContentPane().add(jSeparator23, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 260, 10));
+
+        txtBuscarProducto.setBorder(null);
+        jDialogproducto.getContentPane().add(txtBuscarProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, 260, 25));
+
+        btnBuscarProducto.setBackground(new java.awt.Color(34, 73, 24));
+        btnBuscarProducto.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnBuscarProducto.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscarProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnBuscarProducto.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnBuscarProducto.setBorderPainted(false);
+        btnBuscarProducto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBuscarProducto.setFocusPainted(false);
+        btnBuscarProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarProductoActionPerformed(evt);
+            }
+        });
+        jDialogproducto.getContentPane().add(btnBuscarProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 10, 70, 40));
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel8.setText("Buscar nombre de producto:");
+        jDialogproducto.getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
         jDialogDetalles.setTitle("Detalle de venta");
         jDialogDetalles.setLocationByPlatform(true);
@@ -574,6 +611,14 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         jDialogEmpleado.setLocationByPlatform(true);
         jDialogEmpleado.setModal(true);
         jDialogEmpleado.setSize(new java.awt.Dimension(700, 350));
+        jDialogEmpleado.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jSeparator26.setForeground(new java.awt.Color(0, 0, 0));
+        jDialogEmpleado.getContentPane().add(jSeparator26, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 260, 10));
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel12.setText("Buscar por DNI:");
+        jDialogEmpleado.getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 20, -1, -1));
 
         jScrollPane11.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(32, 131, 42), 1, true));
 
@@ -604,22 +649,25 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         });
         jScrollPane11.setViewportView(tblEmpleadoDialog);
 
-        javax.swing.GroupLayout jDialogEmpleadoLayout = new javax.swing.GroupLayout(jDialogEmpleado.getContentPane());
-        jDialogEmpleado.getContentPane().setLayout(jDialogEmpleadoLayout);
-        jDialogEmpleadoLayout.setHorizontalGroup(
-            jDialogEmpleadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogEmpleadoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jDialogEmpleadoLayout.setVerticalGroup(
-            jDialogEmpleadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogEmpleadoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jDialogEmpleado.getContentPane().add(jScrollPane11, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 690, 270));
+
+        txtBuscarEmpleado.setBorder(null);
+        jDialogEmpleado.getContentPane().add(txtBuscarEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, 260, 25));
+
+        btnBuscarEmpleado.setBackground(new java.awt.Color(34, 73, 24));
+        btnBuscarEmpleado.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnBuscarEmpleado.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscarEmpleado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnBuscarEmpleado.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnBuscarEmpleado.setBorderPainted(false);
+        btnBuscarEmpleado.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBuscarEmpleado.setFocusPainted(false);
+        btnBuscarEmpleado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarEmpleadoActionPerformed(evt);
+            }
+        });
+        jDialogEmpleado.getContentPane().add(btnBuscarEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 10, 70, 40));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("LianFarma");
@@ -1261,7 +1309,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         });
         jScrollPane3.setViewportView(tblVentas);
 
-        panelVentas.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 820, 370));
+        panelVentas.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, 820, 370));
 
         btnVactualizar.setBackground(new java.awt.Color(34, 73, 24));
         btnVactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1278,7 +1326,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
                 btnVactualizarActionPerformed(evt);
             }
         });
-        panelVentas.add(btnVactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 440, 180, 40));
+        panelVentas.add(btnVactualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 480, 180, 40));
 
         btnVfiltrarXdia.setBackground(new java.awt.Color(34, 73, 24));
         btnVfiltrarXdia.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1296,7 +1344,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
                 btnVfiltrarXdiaActionPerformed(evt);
             }
         });
-        panelVentas.add(btnVfiltrarXdia, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, 210, 40));
+        panelVentas.add(btnVfiltrarXdia, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 480, 210, 40));
 
         btnVfiltrarXSemana.setBackground(new java.awt.Color(34, 73, 24));
         btnVfiltrarXSemana.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1314,7 +1362,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
                 btnVfiltrarXSemanaActionPerformed(evt);
             }
         });
-        panelVentas.add(btnVfiltrarXSemana, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 440, 200, 40));
+        panelVentas.add(btnVfiltrarXSemana, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 480, 200, 40));
 
         btnVfiltrarXquincena.setBackground(new java.awt.Color(34, 73, 24));
         btnVfiltrarXquincena.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1332,7 +1380,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
                 btnVfiltrarXquincenaActionPerformed(evt);
             }
         });
-        panelVentas.add(btnVfiltrarXquincena, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 510, 210, 40));
+        panelVentas.add(btnVfiltrarXquincena, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 550, 210, 40));
 
         btnVfiltrarXmes.setBackground(new java.awt.Color(34, 73, 24));
         btnVfiltrarXmes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -1350,7 +1398,32 @@ public class PlataformaAdmin extends javax.swing.JFrame {
                 btnVfiltrarXmesActionPerformed(evt);
             }
         });
-        panelVentas.add(btnVfiltrarXmes, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 510, 200, 40));
+        panelVentas.add(btnVfiltrarXmes, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 550, 200, 40));
+
+        jSeparator27.setForeground(new java.awt.Color(0, 0, 0));
+        panelVentas.add(jSeparator27, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 60, 260, 10));
+
+        txtBuscarIdCliente.setBorder(null);
+        panelVentas.add(txtBuscarIdCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 260, 25));
+
+        btnBuscarIdCliente.setBackground(new java.awt.Color(34, 73, 24));
+        btnBuscarIdCliente.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnBuscarIdCliente.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscarIdCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconmonstr-search-thin-32.png"))); // NOI18N
+        btnBuscarIdCliente.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        btnBuscarIdCliente.setBorderPainted(false);
+        btnBuscarIdCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBuscarIdCliente.setFocusPainted(false);
+        btnBuscarIdCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarIdClienteActionPerformed(evt);
+            }
+        });
+        panelVentas.add(btnBuscarIdCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 30, 70, 40));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel13.setText("Buscar por ID cliente:");
+        panelVentas.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, -1, -1));
 
         paneles.addTab("COMPRABANTES", panelVentas);
 
@@ -1389,38 +1462,6 @@ public class PlataformaAdmin extends javax.swing.JFrame {
 
         panelReportes.add(jScrollPane8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 820, 370));
 
-        jButton1.setText("Generar reporte de Quincena");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        panelReportes.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 560, -1, -1));
-
-        jButton3.setText("Generar reporte de Dia");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        panelReportes.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 480, -1, -1));
-
-        jButton4.setText("Generar reporte de Semana");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        panelReportes.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 440, -1, -1));
-
-        jButton5.setText("Generar reporte de Mes");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-        panelReportes.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 520, -1, -1));
-
         btnRactualizar.setBackground(new java.awt.Color(34, 73, 24));
         btnRactualizar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnRactualizar.setForeground(new java.awt.Color(255, 255, 255));
@@ -1454,7 +1495,28 @@ public class PlataformaAdmin extends javax.swing.JFrame {
                 btnRcrearComprobanteActionPerformed(evt);
             }
         });
-        panelReportes.add(btnRcrearComprobante, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 470, 240, 40));
+        panelReportes.add(btnRcrearComprobante, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 470, 240, 40));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel3.setText("Generar excel por: ");
+        panelReportes.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 480, -1, -1));
+
+        cmbGenerarExcel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Dia", "Semana", "Quincena", "Mes" }));
+        panelReportes.add(cmbGenerarExcel, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 480, 150, 30));
+
+        jButton6.setBackground(new java.awt.Color(34, 73, 24));
+        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/file_type_excel_icon_130611.png"))); // NOI18N
+        jButton6.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        jButton6.setBorderPainted(false);
+        jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton6.setFocusPainted(false);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        panelReportes.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 470, 70, 40));
 
         paneles.addTab("REPORTES", panelReportes);
 
@@ -2578,43 +2640,11 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         btnRcrearComprobante.setEnabled(true);
     }//GEN-LAST:event_tblVentasReporteMouseClicked
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
-        
-        String nombreArchivo = "dia";
-        rpteExcel.crearExcel(ventas, nombreArchivo);
-
-        rpteExcel.abrirarchivoExcel(nombreArchivo);
-
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
-        String nombreArchivo = "semana";
-        rpteExcel.crearExcel(ventas, nombreArchivo);
-        rpteExcel.abrirarchivoExcel(nombreArchivo);
-    }//GEN-LAST:event_jButton4ActionPerformed
-
     private void btnRactualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRactualizarActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
         ventas = ventaJDBC.select(empleados, clientes, productos);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnRactualizarActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String nombreArchivo = "quincena";
-        rpteExcel.crearExcel(ventas, nombreArchivo);
-        rpteExcel.abrirarchivoExcel(nombreArchivo);
-
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
-        String nombreArchivo = "mes";
-        rpteExcel.crearExcel(ventas, nombreArchivo);
-        rpteExcel.abrirarchivoExcel(nombreArchivo);
-    }//GEN-LAST:event_jButton5ActionPerformed
 
     private void sec01MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec01MouseClicked
         paneles.setSelectedIndex(0);
@@ -2774,25 +2804,73 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
 
         actualizarTablaVenta();
-        
+
     }//GEN-LAST:event_btnVfiltrarXdiaActionPerformed
 
     private void btnVfiltrarXSemanaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXSemanaActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
         actualizarTablaVenta();
-        
+
     }//GEN-LAST:event_btnVfiltrarXSemanaActionPerformed
 
     private void btnVfiltrarXquincenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXquincenaActionPerformed
         ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 15);
         actualizarTablaVenta();
-        
+
     }//GEN-LAST:event_btnVfiltrarXquincenaActionPerformed
 
     private void btnVfiltrarXmesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVfiltrarXmesActionPerformed
         ventas = ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
         actualizarTablaVenta();
     }//GEN-LAST:event_btnVfiltrarXmesActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        switch (cmbGenerarExcel.getSelectedIndex()) {
+            case 0:
+                generarExcelXdia();
+                break;
+            case 1:
+                generarExcelXsemana();
+                break;
+            case 2:
+                generarExcelXquincena();
+                break;
+            case 3:
+                generarExcelXmes();
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "error");
+
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void btnBuscarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarProductoActionPerformed
+        String buscar = txtBuscarProducto.getText();
+
+        productos = productoJDBC.search(buscar);
+        actualizarTablaProducto();
+    }//GEN-LAST:event_btnBuscarProductoActionPerformed
+
+    private void btnBuscarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarClienteActionPerformed
+        String buscar = txtBuscarCliente.getText();
+
+        clientes = clienteJDBC.search(buscar);
+        actualizarTablaCliente();
+    }//GEN-LAST:event_btnBuscarClienteActionPerformed
+
+    private void btnBuscarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarEmpleadoActionPerformed
+        String buscar = txtBuscarEmpleado.getText();
+
+        empleados = empleadoJDBC.search(buscar);
+        actualizarTablaEmpleado();
+    }//GEN-LAST:event_btnBuscarEmpleadoActionPerformed
+
+    private void btnBuscarIdClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarIdClienteActionPerformed
+        String buscar = txtBuscarIdCliente.getText();
+
+        ventas = ventaJDBC.search(empleados, clientes, productos, buscar);
+        actualizarTablaVenta();
+    }//GEN-LAST:event_btnBuscarIdClienteActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -2899,8 +2977,43 @@ public class PlataformaAdmin extends javax.swing.JFrame {
         txtUempleado.setText("");
     }
 
+    private void generarExcelXdia() {
+        String fechaHoy = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        ventas = ventaJDBC.selectVentaDia(empleados, clientes, productos, fechaHoy);
+
+        String nombreArchivo = "dia";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
+    }
+
+    private void generarExcelXsemana() {
+        ventas = ventaJDBC.selectVentaPorDias(empleados, clientes, productos, 7);
+        String nombreArchivo = "semana";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
+    }
+
+    private void generarExcelXquincena() {
+        String nombreArchivo = "quincena";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
+
+    }
+
+    private void generarExcelXmes() {
+        ventaJDBC.selectVentaUltimoMes(empleados, clientes, productos);
+        String nombreArchivo = "mes";
+        rpteExcel.crearExcel(ventas, nombreArchivo);
+        rpteExcel.abrirarchivoExcel(nombreArchivo);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarCarrito;
+    private javax.swing.JButton btnBuscarCliente;
+    private javax.swing.JButton btnBuscarEmpleado;
+    private javax.swing.JButton btnBuscarIdCliente;
+    private javax.swing.JButton btnBuscarProducto;
     private javax.swing.JButton btnCactualizar;
     private javax.swing.JButton btnCeliminar;
     private javax.swing.JButton btnCmostrar;
@@ -2933,14 +3046,12 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel cabecera;
     private javax.swing.JComboBox<String> cmbEtipoEmpleado;
+    private javax.swing.JComboBox<String> cmbGenerarExcel;
     private javax.swing.JComboBox<String> cmbPpresentacion;
     private javax.swing.JComboBox<String> cmbVmetodoPago;
     private javax.swing.JLabel foto;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JDialog jDialogClientes;
     private javax.swing.JDialog jDialogDetalles;
     private javax.swing.JDialog jDialogEmpleado;
@@ -2948,6 +3059,8 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
@@ -2958,6 +3071,7 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
@@ -2972,6 +3086,8 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane11;
@@ -2998,7 +3114,11 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator21;
     private javax.swing.JSeparator jSeparator22;
+    private javax.swing.JSeparator jSeparator23;
     private javax.swing.JSeparator jSeparator24;
+    private javax.swing.JSeparator jSeparator25;
+    private javax.swing.JSeparator jSeparator26;
+    private javax.swing.JSeparator jSeparator27;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
@@ -3037,6 +3157,10 @@ public class PlataformaAdmin extends javax.swing.JFrame {
     private javax.swing.JTable tblUsuarios;
     private javax.swing.JTable tblVentas;
     private javax.swing.JTable tblVentasReporte;
+    public static javax.swing.JTextField txtBuscarCliente;
+    public static javax.swing.JTextField txtBuscarEmpleado;
+    public static javax.swing.JTextField txtBuscarIdCliente;
+    public static javax.swing.JTextField txtBuscarProducto;
     private javax.swing.JTextField txtCapellidos;
     private javax.swing.JTextField txtCdni;
     private javax.swing.JTextField txtCnombres;

@@ -16,4 +16,6 @@ public interface EmpleadoDAO {
     
     public String getEmpleadoActual(int id_empleado) throws SQLException;
     
+    public List<Empleado> search(String buscar) throws SQLException;
+    
 }

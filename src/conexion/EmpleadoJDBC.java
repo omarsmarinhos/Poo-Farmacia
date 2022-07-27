@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EmpleadoJDBC implements EmpleadoDAO {
 
@@ -147,6 +148,34 @@ public class EmpleadoJDBC implements EmpleadoDAO {
         boolean aux = error;
         error = false;
         return aux;
+    }
+
+    @Override
+    public ArrayList<Empleado> search(String string){
+        ArrayList<Empleado> empleados = new ArrayList<>();
+        try {
+            connection = Conexion.getConexion();
+            statement = connection.createStatement();
+            String query = "SELECT * FROM empleados WHERE dni LIKE '" + string + "%'";
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                empleados.add(new Empleado(
+                        rs.getInt("id_empleado"),
+                        rs.getString("nombres"),
+                        rs.getString("apellidos"),
+                        rs.getString("dni"),
+                        rs.getString("tipo_empleado"),
+                        rs.getFloat("sueldo"),
+                        rs.getString("cargo")));
+            }
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("Empleado-buscado");
+        } catch (SQLException ex) {
+            System.out.println("Error-buscarEmpleado" + ex.toString());
+        }
+        return empleados;
     }
 
 }
