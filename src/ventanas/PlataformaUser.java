@@ -60,6 +60,7 @@ public class PlataformaUser extends javax.swing.JFrame {
         empleados = empleadoJDBC.select();
         clientes = clienteJDBC.select();
         productos = productoJDBC.select();
+        detalles = new ArrayList<>();
 
         initComponents();
 
@@ -1591,6 +1592,7 @@ public class PlataformaUser extends javax.swing.JFrame {
     private void sec02MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec02MouseClicked
         paneles.setSelectedIndex(0);
         detalles = new ArrayList<>();
+        actualizarTablaDetalle();
     }//GEN-LAST:event_sec02MouseClicked
 
     private void sec03MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sec03MouseClicked
