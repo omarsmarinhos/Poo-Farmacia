@@ -13,14 +13,13 @@ import javax.swing.JOptionPane;
 public class Login extends javax.swing.JFrame {
 
     Pass pass = new Pass();
-    
+
     public Login() {
         initComponents();
         System.out.println("User: admin");
         System.out.println("Pass: omar");
     }
 
- 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -179,11 +178,11 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel8MouseExited
 
     private void btnIngresarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIngresarMouseEntered
-        btnIngresar.setBackground(new Color(75,158,51));
+        btnIngresar.setBackground(new Color(75, 158, 51));
     }//GEN-LAST:event_btnIngresarMouseEntered
 
     private void btnIngresarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIngresarMouseExited
-        btnIngresar.setBackground(new Color(62,131,42));
+        btnIngresar.setBackground(new Color(62, 131, 42));
     }//GEN-LAST:event_btnIngresarMouseExited
 
     private void txtUserMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtUserMousePressed
@@ -214,22 +213,34 @@ public class Login extends javax.swing.JFrame {
         try {
             Connection con = Conexion.getConexion();
             Statement sql = con.createStatement();
-            String query = "SELECT id_empleado, user, password FROM usuarios WHERE user = '" + user + "'";
+            String query = "SELECT e.id_empleado, e.tipo_empleado, u.user, u.password "
+                    + "FROM empleados e INNER JOIN usuarios u ON e.id_empleado = u.id_empleado "
+                    + "WHERE u.user = '" + user + "'";
             ResultSet rs = sql.executeQuery(query);
-
-            while (rs.next()) {
+            
+            rs.next();
+            int filas = rs.getRow();
+            
+            if (filas > 0) {
                 int id_empleado = rs.getInt("id_empleado");
-                System.out.println("" + id_empleado);
                 String passDB = rs.getString("password");
+                String tipoEmpleado = rs.getString("tipo_empleado");
+
                 if (passDB.equals(pass.encriptar(password))) {
-                    
-                    System.out.println("Usuario-obtenido");
-                    PlataformaAdmin p = new PlataformaAdmin(id_empleado);
-                    p.setVisible(true);
-                    this.dispose();
+                    if (tipoEmpleado.equals("Administrador")) {
+                        PlataformaAdmin pa = new PlataformaAdmin(id_empleado);
+                        pa.setVisible(true);
+                        this.dispose();
+                    } else if (tipoEmpleado.equals("Usuario")) {
+                        PlataformaUser pu = new PlataformaUser(id_empleado);
+                        pu.setVisible(true);
+                        this.dispose();
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Contraseña incorrecta");
+                    JOptionPane.showMessageDialog(this, "Contraseña y/o Usuario incorrecto");
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Contraseña y/o Usuario incorrecto");
             }
 
             rs.close();
@@ -237,7 +248,7 @@ public class Login extends javax.swing.JFrame {
             con.close();
         } catch (SQLException ex) {
             System.out.println("Error-Usuario" + ex.toString());
-        } catch (HeadlessException ex){
+        } catch (HeadlessException ex) {
             JOptionPane.showMessageDialog(this, "Usuario no existe");
         }
     }//GEN-LAST:event_btnIngresarMouseClicked
